@@ -31,6 +31,7 @@ const EditProduct = () => {
     material: "",
     pupillaryDistance: "",
     faceShape: "",
+    quantityAvailable: 0,
   });
 
   // Error state
@@ -567,6 +568,18 @@ const EditProduct = () => {
                       className="form-control"
                       name="frameWidth"
                       value={formData.frameWidth}
+                      onChange={handleChange}
+                      placeholder="140 mm"
+                    />
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <label className="form-label">Quantity Available</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="quantityAvailable"
+                      value={formData.quantityAvailable}
                       onChange={handleChange}
                       placeholder="140 mm"
                     />

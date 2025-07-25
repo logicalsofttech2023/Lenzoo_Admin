@@ -6,7 +6,7 @@ import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
 
-const ProductList = () => {
+const OrdersList = () => {
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ProductList = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${base_url}getAllProductsInAdmin`, {
+      const response = await axios.get(`${base_url}getAllOrders`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -56,18 +56,6 @@ const ProductList = () => {
   useEffect(() => {
     fetchData();
   }, [base_url, currentPage, itemsPerPage, searchTerm]);
-
-  const handleEdit = (id) => {
-    navigate(`/editProduct`, { state: { id } });
-  };
-  const handleView = (id) => {
-    navigate(`/productDetail`, { state: { id } });
-  };
-
-  const handleDelete = (product) => {
-    setCurrentProduct(product);
-    setDeleteModalIsOpen(true);
-  };
 
   const confirmDelete = async () => {
     setIsSubmitting(true);
@@ -116,10 +104,6 @@ const ProductList = () => {
     }
   };
 
-  const handleAdd = () => {
-    navigate("/addProduct");
-  };
-
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -160,8 +144,8 @@ const ProductList = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Products</h4>
-              <h6>Manage your Products</h6>
+              <h4 className="fw-bold">Orders</h4>
+              <h6>Manage your Orders</h6>
             </div>
           </div>
         </div>
@@ -202,13 +186,6 @@ const ProductList = () => {
                 </button>
               </form>
             </div>
-            <button
-              className="btn btn-primary d-flex align-items-center"
-              onClick={handleAdd}
-            >
-              <FiPlus style={{ marginRight: "5px" }} />
-              Add Product
-            </button>
           </div>
           <div className="card-body p-0">
             <div className="table-responsive">
@@ -216,9 +193,11 @@ const ProductList = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Title</th>
+                    <th>Order ID</th>
+                    <th>User Name</th>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+
                     <th>Product ID</th>
                     <th>Type</th>
                     <th>Frame Type</th>
@@ -233,7 +212,7 @@ const ProductList = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan="12" className="py-5">
+                      <td colSpan="14" className="py-5">
                         <div
                           style={{
                             display: "flex",
@@ -262,91 +241,81 @@ const ProductList = () => {
                       </td>
                     </tr>
                   ) : data.length > 0 ? (
-                    data.map((product, index) => (
-                      <tr key={index}>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>
-                          {product.images && product.images.length > 0 ? (
-                            <img
-                              src={`${file_url}${product.images[0]}`}
-                              alt={product.name}
-                              style={{
-                                width: "50px",
-                                height: "50px",
-                                objectFit: "cover",
-                              }}
-                            />
-                          ) : (
-                            <span>No Image</span>
-                          )}
-                        </td>
-                        <td>{product.name}</td>
-                        <td>{product.title}</td>
-                        <td>{product.productId}</td>
-                        <td>{product.productType}</td>
-                        <td>{product.frameType}</td>
-                        <td>{product.frameShape}</td>
-                        <td>₹{product.originalPrice}</td>
-                        <td>₹{product.sellingPrice}</td>
-                        <td>{product.quantityAvailable}</td>
-                        <td>
-                          <div
-                            className="d-flex flex-wrap gap-1"
-                            style={{ maxWidth: "150px" }}
-                          >
-                            {product.frameColor &&
-                            product.frameColor.length > 0 ? (
-                              product.frameColor.map((color, colorIndex) => (
-                                <div
-                                  key={colorIndex}
-                                  title={color}
+                    data.map((order, orderIndex) =>
+                      order.items.map((item, itemIndex) => {
+                        const product = item.productId;
+                        return (
+                          <tr key={`${order._id}-${item._id}`}>
+                            <td>
+                              {(currentPage - 1) * itemsPerPage +
+                                orderIndex +
+                                1}
+                            </td>
+                            <td>{order.orderId}</td>
+                            <td>{`${order?.userId?.firstName} ${order?.userId?.lastName}`}</td>
+                            <td>
+                              {product?.images && product.images.length > 0 ? (
+                                <img
+                                  src={`${file_url}${product.images[0]}`}
+                                  alt={product.name}
                                   style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    backgroundColor: color,
-                                    borderRadius: "50%",
-                                    border: "1px solid #ddd",
-                                    cursor: "pointer",
+                                    width: "50px",
+                                    height: "50px",
+                                    objectFit: "cover",
                                   }}
                                 />
-                              ))
-                            ) : (
-                              <span>No Color</span>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="edit-delete-action d-flex align-items-center">
-                            <button
-                              className="me-2 p-2 d-flex align-items-center border rounded"
-                              onClick={() => handleEdit(product._id)}
-                            >
-                              <FiEdit style={{ marginRight: "5px" }} />
-                              Edit
-                            </button>
-                            <button
-                              className="p-2 d-flex align-items-center border rounded text-danger"
-                              onClick={() => handleDelete(product)}
-                            >
-                              <FiTrash2 style={{ marginRight: "5px" }} />
-                              Delete
-                            </button>
+                              ) : (
+                                <span>No Image</span>
+                              )}
+                            </td>
+                            <td>{product?.name}</td>
 
-                            <button
-                              className="ms-2 p-2 d-flex align-items-center border rounded"
-                              onClick={() => handleView(product._id)}
-                            >
-                              <FiEye style={{ marginRight: "5px" }} />
-                              View
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                            <td>{product?.productId}</td>
+                            <td>{product?.productType}</td>
+                            <td>{product?.frameType}</td>
+                            <td>{product?.frameShape}</td>
+                            <td>₹{product?.originalPrice}</td>
+                            <td>₹{product?.sellingPrice}</td>
+                            <td>{item?.quantity}</td>
+                            <td>
+                              <div
+                                className="d-flex flex-wrap gap-1"
+                                style={{ maxWidth: "150px" }}
+                              >
+                                {product?.frameColor &&
+                                product.frameColor.length > 0 ? (
+                                  product.frameColor.map(
+                                    (color, colorIndex) => (
+                                      <div
+                                        key={colorIndex}
+                                        title={color}
+                                        style={{
+                                          width: "20px",
+                                          height: "20px",
+                                          backgroundColor: color,
+                                          borderRadius: "50%",
+                                          border: "1px solid #ddd",
+                                          cursor: "pointer",
+                                        }}
+                                      />
+                                    )
+                                  )
+                                ) : (
+                                  <span>No Color</span>
+                                )}
+                              </div>
+                            </td>
+                            <td>
+                              {/* Actions here like view, cancel, etc. */}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )
                   ) : (
                     <tr>
-                      <td colSpan="12" className="text-center py-4">
-                        No Products found.
+                      <td colSpan="14" className="text-center py-4">
+                        No Orders Found.
                       </td>
                     </tr>
                   )}
@@ -481,4 +450,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default OrdersList;

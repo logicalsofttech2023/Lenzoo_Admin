@@ -205,7 +205,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                     </li>
                     
 
-                    <li className={isActive("/subscribers") ? "active" : ""}>
+                    {/* <li className={isActive("/subscribers") ? "active" : ""}>
                       <Link to="/subscribers">
                         <i data-feather="box" />
                         <span>Subscribers</span>
@@ -219,7 +219,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                         <i data-feather="box" />
                         <span>Contact Requests</span>
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </li>
 
@@ -234,6 +234,24 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                       <Link to="/productList">
                         <i data-feather="box" />
                         <span>Product List</span>
+                      </Link>
+                    </li>
+
+                    
+                  </ul>
+                </li>
+
+                <li className="submenu-open">
+                  <h6 className="submenu-hdr">Order Management</h6>
+                  <ul>
+                    <li
+                      className={
+                        isActive("/ordersList") ? "active" : ""
+                      }
+                    >
+                      <Link to="/ordersList">
+                        <i data-feather="box" />
+                        <span>Orders List</span>
                       </Link>
                     </li>
 
@@ -272,12 +290,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                 <li className="submenu-open">
                   <h6 className="submenu-hdr">Settings</h6>
                   <ul>
-                    <li className={isActive("/testimonials") ? "active" : ""}>
-                      <Link to="/testimonials">
-                        <i className="ti ti-settings fs-16 me-2" />
-                        <span>Testimonials</span>
-                      </Link>
-                    </li>
+                    
                     <li className={isActive("/aboutUs") ? "active" : ""}>
                       <Link to="/aboutUs">
                         <i className="ti ti-settings fs-16 me-2" />

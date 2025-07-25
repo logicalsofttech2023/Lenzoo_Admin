@@ -9,44 +9,44 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend
+  Legend,
 } from "recharts";
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
-const [selectedFilter, setSelectedFilter] = useState("1y"); // default selected
-const [chartData, setChartData] = useState([]);
-const [maxValue, setMaxValue] = useState(0);
-const [totalAmount, setTotalAmount] = useState(0);
-const [usersCount, setUsersCount] = useState({});
+  const [selectedFilter, setSelectedFilter] = useState("1y"); // default selected
+  const [chartData, setChartData] = useState([]);
+  const [maxValue, setMaxValue] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [usersCount, setUsersCount] = useState({});
 
- const fetchGraphStats = async () => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}getGraphStats`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+  const fetchGraphStats = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}getGraphStats`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (res.status === 200) {
+        const stats = res.data.stats;
+        const formattedData = Object.entries(stats).map(([key, val]) => ({
+          name: key.toUpperCase(),
+          value: val.totalAmount,
+          count: val.count,
+        }));
+
+        setChartData(formattedData);
+        setTotalAmount(stats[selectedFilter]?.totalAmount || 0);
+        const max = Math.max(...formattedData.map((d) => d.value));
+        setMaxValue(max);
       }
-    );
-    if (res.status === 200) {
-      const stats = res.data.stats;
-      const formattedData = Object.entries(stats).map(([key, val]) => ({
-        name: key.toUpperCase(),
-        value: val.totalAmount,
-        count: val.count,
-      }));
-
-      setChartData(formattedData);
-      setTotalAmount(stats[selectedFilter]?.totalAmount || 0);
-      const max = Math.max(...formattedData.map((d) => d.value));
-      setMaxValue(max);
+    } catch (err) {
+      console.error("Error fetching graph stats:", err);
     }
-  } catch (err) {
-    console.error("Error fetching graph stats:", err);
-  }
-};
+  };
 
   const fetchStats = async () => {
     try {
@@ -251,176 +251,71 @@ const [usersCount, setUsersCount] = useState({});
         </div>
 
         {/* Charts and Info Section */}
-        <div className="row">
-  <div className="col-xxl-8 col-xl-7 col-sm-12 col-12 d-flex">
-    <div className="card flex-fill">
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <div className="d-inline-flex align-items-center">
-          <span className="title-icon bg-soft-primary fs-16 me-2">
-            <i className="ti ti-shopping-cart" />
-          </span>
-          <h5 className="card-title mb-0">Sales & Purchase</h5>
-        </div>
-        <ul className="nav btn-group custom-btn-group">
-          {["1D", "1W", "1M", "3M", "6M", "1Y"].map((label) => (
-            <a
-              key={label}
-              className={`btn btn-outline-light ${
-                selectedFilter === label.toLowerCase() ? "active" : ""
-              }`}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectedFilter(label.toLowerCase());
-              }}
-            >
-              {label}
-            </a>
-          ))}
-        </ul>
-      </div>
-
-      <div className="card-body pb-0">
-        <div className="d-flex align-items-center gap-2 mb-3">
-          <div className="border p-2 br-8">
-            <p className="d-inline-flex align-items-center mb-1">
-              <i className="ti ti-circle-filled fs-8 text-primary-300 me-1" />
-              Total Amount ({selectedFilter.toUpperCase()})
-            </p>
-            <h4>₹{totalAmount.toLocaleString()}</h4>
-          </div>
-        </div>
-
-        <div style={{ width: "100%", height: 300 }}>
-          <ResponsiveContainer>
-            <LineChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis domain={[0, maxValue]} />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#fe9f43"
-                activeDot={{ r: 8 }}
-                name="Total Amount"
-              />
-              <Line
-                type="monotone"
-                dataKey="count"
-                stroke="#8884d8"
-                name="Transaction Count"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-        {/* Sales Statistics & Recent Transactions */}
         {/* <div className="row">
-          <div className="col-xl-6 col-sm-12 col-12 d-flex">
+          <div className="col-xxl-8 col-xl-7 col-sm-12 col-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <div className="d-inline-flex align-items-center">
-                  <span className="title-icon bg-soft-danger fs-16 me-2">
-                    <i className="ti ti-alert-triangle" />
+                  <span className="title-icon bg-soft-primary fs-16 me-2">
+                    <i className="ti ti-shopping-cart" />
                   </span>
-                  <h5 className="card-title mb-0">Sales Statics</h5>
+                  <h5 className="card-title mb-0">Sales & Purchase</h5>
                 </div>
-                <div className="dropdown">
-                  <a
-                    href="#"
-                    className="dropdown-toggle btn btn-sm btn-white"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    <i className="ti ti-calendar me-1" />
-                    2025
-                  </a>
-                  <ul className="dropdown-menu p-3">
-                    <li>
-                      <a href="#" className="dropdown-item">
-                        2025
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="dropdown-item">
-                        2022
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="dropdown-item">
-                        2021
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                <ul className="nav btn-group custom-btn-group">
+                  {["1D", "1W", "1M", "3M", "6M", "1Y"].map((label) => (
+                    <a
+                      key={label}
+                      className={`btn btn-outline-light ${
+                        selectedFilter === label.toLowerCase() ? "active" : ""
+                      }`}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedFilter(label.toLowerCase());
+                      }}
+                    >
+                      {label}
+                    </a>
+                  ))}
+                </ul>
               </div>
 
               <div className="card-body pb-0">
-                <div className="d-flex align-items-center flex-wrap gap-2 mb-3">
+                <div className="d-flex align-items-center gap-2 mb-3">
                   <div className="border p-2 br-8">
-                    <h5 className="d-inline-flex align-items-center text-teal">
-                      $12,189
-                      <span className="badge badge-success badge-xs d-inline-flex align-items-center ms-2">
-                        <i className="ti ti-arrow-up-left me-1" />
-                        25%
-                      </span>
-                    </h5>
-                    <p>Revenue</p>
-                  </div>
-                  <div className="border p-2 br-8">
-                    <h5 className="d-inline-flex align-items-center text-orange">
-                      $48,988,078
-                      <span className="badge badge-danger badge-xs d-inline-flex align-items-center ms-2">
-                        <i className="ti ti-arrow-down-right me-1" />
-                        25%
-                      </span>
-                    </h5>
-                    <p>Expense</p>
+                    <p className="d-inline-flex align-items-center mb-1">
+                      <i className="ti ti-circle-filled fs-8 text-primary-300 me-1" />
+                      Total Amount ({selectedFilter.toUpperCase()})
+                    </p>
+                    <h4>₹{totalAmount.toLocaleString()}</h4>
                   </div>
                 </div>
 
                 <div style={{ width: "100%", height: 300 }}>
                   <ResponsiveContainer>
-                    <BarChart
-                      data={salesData}
+                    <LineChart
+                      data={chartData}
                       margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                      stackOffset="sign" // This makes positive and negative values stack from center
                     >
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                      <YAxis
-                        domain={[-30000, 30000]}
-                        tickFormatter={(v) => `${v / 1000}K`}
-                        axisLine={false}
-                        tickLine={false}
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis domain={[0, maxValue]} />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#fe9f43"
+                        activeDot={{ r: 8 }}
+                        name="Total Amount"
                       />
-                      <Tooltip
-                        formatter={(value) =>
-                          `$${Math.abs(value).toLocaleString()}`
-                        }
+                      <Line
+                        type="monotone"
+                        dataKey="count"
+                        stroke="#8884d8"
+                        name="Transaction Count"
                       />
-                      <Bar
-                        dataKey="revenue"
-                        fill="#1cc88a"
-                        name="Revenue"
-                        radius={[4, 4, 0, 0]} // Rounded top corners
-                      />
-                      <Bar
-                        dataKey="expense"
-                        fill="#e74a3b"
-                        name="Expense"
-                        radius={[4, 4, 0, 0]} // Rounded top corners
-                      />
-                    </BarChart>
+                    </LineChart>
                   </ResponsiveContainer>
                 </div>
               </div>

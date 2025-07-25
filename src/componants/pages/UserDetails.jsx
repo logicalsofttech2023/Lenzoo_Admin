@@ -10,7 +10,6 @@ const UserDetails = () => {
   const { userId } = location?.state || {};
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [plans, setPlans] = useState([]);
   const [imageError, setImageError] = useState(false);
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
@@ -18,27 +17,54 @@ const UserDetails = () => {
   const fetchUserDetails = async () => {
     try {
       setLoading(true);
-
       const response = await axios.get(
-        `${base_url}getUserDetailInAdmin?userId=${userId}`,{
+        `${base_url}getUserDetailsById?id=${userId}`,
+        {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
 
-      if (!response.data?.data?.user) {
+      if (!response.data?.user) {
         throw new Error("No user data found");
       }
 
-      setUserData(response.data.data.user);
-      setPlans(response.data.data.plans || []);
+      setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user details:", error);
       toast.error(error.message || "Failed to fetch user details");
-      navigate(-1);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const response = await axios.post(
+        `${base_url}updateOrderStatus`,
+        {
+          orderId,
+          status: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Order status updated successfully");
+        fetchUserDetails(); // Refresh the data
+      } else {
+        throw new Error(
+          response.data.message || "Failed to update order status"
+        );
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast.error(error.message || "Failed to update order status");
     }
   };
 
@@ -49,7 +75,67 @@ const UserDetails = () => {
       return;
     }
     fetchUserDetails();
-  }, [userId, navigate]);
+  }, [userId]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return isNaN(date.getTime())
+      ? "Invalid Date"
+      : date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+  };
+
+  const getFullName = () => {
+    return [userData?.firstName, userData?.middleName, userData?.lastName]
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    })
+      .format(price)
+      .replace("₹", "₹ ");
+  };
+
+  const getOrderStatusBadge = (status) => {
+    switch (status) {
+      case "placed":
+        return <span className="badge bg-primary">Placed</span>;
+      case "processing":
+        return <span className="badge bg-secondary">Processing</span>;
+      case "shipped":
+        return <span className="badge bg-info text-dark">Shipped</span>;
+      case "delivered":
+        return <span className="badge bg-success">Delivered</span>;
+      case "cancelled":
+        return <span className="badge bg-danger">Cancelled</span>;
+      default:
+        return <span className="badge bg-secondary">{status}</span>;
+    }
+  };
+
+  const getPaymentStatusBadge = (status) => {
+    switch (status) {
+      case "paid":
+        return <span className="badge bg-success">Paid</span>;
+      case "pending":
+        return <span className="badge bg-warning">Pending</span>;
+      case "failed":
+        return <span className="badge bg-danger">Failed</span>;
+      case "refunded":
+        return <span className="badge bg-info text-dark">Refunded</span>;
+      default:
+        return <span className="badge bg-secondary">{status}</span>;
+    }
+  };
 
   if (loading) {
     return (
@@ -81,63 +167,6 @@ const UserDetails = () => {
       </div>
     );
   }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return isNaN(date.getTime())
-      ? "Invalid Date"
-      : date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
-  };
-
-  const formatDateTime = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return isNaN(date.getTime())
-      ? "Invalid Date"
-      : date.toLocaleString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-  };
-
-  const getFullName = () => {
-    return [userData.firstName, userData.middleName, userData.lastName]
-      .filter(Boolean)
-      .join(" ");
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      
-      case "approved":
-        return <span className="badge bg-success">Approved</span>;
-      case "pending":
-        return <span className="badge bg-warning">Pending</span>;
-      case "rejected":
-        return <span className="badge bg-danger">Rejected</span>;
-      default:
-        return <span className="badge bg-secondary">Unknown</span>;
-    }
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    })
-      .format(price)
-      .replace("₹", "₹ ");
-  };
 
   return (
     <div className="main-wrapper">
@@ -189,7 +218,6 @@ const UserDetails = () => {
                   <h2 className="mb-0 fw-bold" style={{ fontSize: "1.75rem" }}>
                     {getFullName()}
                   </h2>
-                  {getStatusBadge(userData.adminVerified)}
                 </div>
 
                 <div className="d-flex flex-wrap gap-3 mb-2">
@@ -208,475 +236,204 @@ const UserDetails = () => {
                     <i className="ti ti-calendar me-2"></i>
                     <span>Joined {formatDate(userData.createdAt)}</span>
                   </div>
-                  
                 </div>
               </div>
             </div>
 
             <div className="row">
-              {/* Left Column */}
-              <div className="col-lg-8">
-                {/* Basic Information */}
-                <div className="card mb-4 border-0 shadow-sm">
-                  <div className="card-header bg-transparent border-0 py-3">
-                    <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-                      <i className="ti ti-info-circle me-2 text-primary"></i>
-                      Basic Information
-                    </h5>
-                  </div>
-                  <div className="card-body pt-0">
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label small mb-1">
-                          Gender
-                        </label>
-                        <p className="fw-medium text-capitalize">
-                          {userData.gender || "N/A"}
-                        </p>
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label small mb-1">
-                          Date of Birth
-                        </label>
-                        <p className="fw-medium">
-                          {userData.dob ? formatDate(userData.dob) : "N/A"}
-                        </p>
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label small mb-1">
-                          Aadhar Number
-                        </label>
-                        <p className="fw-medium">
-                          {userData.aadharNumber || "N/A"}
-                        </p>
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label small mb-1">
-                          PAN Number
-                        </label>
-                        <p className="fw-medium">
-                          {userData.panNumber || "N/A"}
-                        </p>
-                      </div>
-                      <div className="col-12 mb-3">
-                        <label className="form-label small mb-1">
-                          Address
-                        </label>
-                        <p className="fw-medium">{userData.address || "N/A"}</p>
+              <div className="col-lg-12">
+                {/* Orders Section */}
+                {userData.orders?.length > 0 && (
+                  <div className="card mb-4 border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 py-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
+                          <i className="ti ti-shopping-cart me-2 text-primary"></i>
+                          Orders
+                        </h5>
+                        <span className="badge bg-primary">
+                          {userData.orders.length}{" "}
+                          {userData.orders.length === 1 ? "Order" : "Orders"}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Document Verification */}
-                <div className="card mb-4 border-0 shadow-sm">
-                  <div className="card-header bg-transparent border-0 py-3">
-                    <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-                      <i className="ti ti-id me-2 text-primary"></i>
-                      Document Verification
-                    </h5>
-                  </div>
-                  <div className="card-body pt-0">
-                    <div className="row">
-                      <div className="col-md-12 mb-4">
-                        <div className="bg-light p-3 rounded">
-                          <label className="form-label text-muted small mb-2 d-block">
-                            Aadhar Card
-                          </label>
-                          <div className="d-flex gap-2 mb-3">
-                            <div className="flex-grow-1">
-                              <div
-                                className="document-preview border rounded overflow-hidden"
-                                style={{ height: "150px" }}
-                              >
-                                {userData.aadharFrontImage ? (
-                                  <img
-                                    src={`${file_url}${userData.aadharFrontImage}`}
-                                    alt="Aadhar Front"
-                                    className="img-fluid h-100 w-100"
-                                    style={{ objectFit: "cover" }}
-                                    onError={(e) =>
-                                      (e.target.src =
-                                        "/images/document-placeholder.png")
+                    <div className="card-body pt-0">
+                      <div className="table-responsive">
+                        <table className="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>Order ID</th>
+                              <th>Date</th>
+                              <th>Amount</th>
+                              <th>Status</th>
+                              <th>Payment</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {userData.orders.map((order) => (
+                              <tr key={order._id}>
+                                <td className="font-monospace small">
+                                  {order.orderId}
+                                </td>
+                                <td>{formatDate(order.createdAt)}</td>
+                                <td>{formatPrice(order.totalAmount)}</td>
+                                <td>
+                                  <select
+                                    className="form-select form-select-sm"
+                                    value={order.orderStatus}
+                                    onChange={(e) =>
+                                      updateOrderStatus(
+                                        order._id,
+                                        e.target.value
+                                      )
                                     }
-                                  />
-                                ) : (
-                                  <div className="h-100 d-flex align-items-center justify-content-center bg-white">
-                                    <span className="text-muted">
-                                      No image available
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              <small className="text-center d-block mt-1">
-                                Front Side
-                              </small>
-                            </div>
-                            <div className="flex-grow-1">
-                              <div
-                                className="document-preview border rounded overflow-hidden"
-                                style={{ height: "150px" }}
-                              >
-                                {userData.aadharBackImage ? (
-                                  <img
-                                    src={`${file_url}${userData.aadharBackImage}`}
-                                    alt="Aadhar Back"
-                                    className="img-fluid h-100 w-100"
-                                    style={{ objectFit: "cover" }}
-                                    onError={(e) =>
-                                      (e.target.src =
-                                        "/images/document-placeholder.png")
-                                    }
-                                  />
-                                ) : (
-                                  <div className="h-100 d-flex align-items-center justify-content-center bg-white">
-                                    <span className="text-muted">
-                                      No image available
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              <small className="text-center d-block mt-1">
-                                Back Side
-                              </small>
-                            </div>
-                          </div>
-                          <div className="d-flex gap-2">
-                            <a
-                              href={`${file_url}${userData.aadharFrontImage}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary w-100"
-                              disabled={!userData.aadharFrontImage}
-                            >
-                              <i className="ti ti-download me-1"></i> Download
-                              Front
-                            </a>
-                            <a
-                              href={`${file_url}${userData.aadharBackImage}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary w-100"
-                              disabled={!userData.aadharBackImage}
-                            >
-                              <i className="ti ti-download me-1"></i> Download
-                              Back
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-12 mb-4">
-                        <div className="bg-light p-3 rounded">
-                          <label className="form-label text-muted small mb-2 d-block">
-                            PAN Card
-                          </label>
-                          <div className="d-flex gap-2 mb-3">
-                            <div className="flex-grow-1">
-                              <div
-                                className="document-preview border rounded overflow-hidden"
-                                style={{ height: "150px" }}
-                              >
-                                {userData.panFrontImage ? (
-                                  <img
-                                    src={`${file_url}${userData.panFrontImage}`}
-                                    alt="PAN Front"
-                                    className="img-fluid h-100 w-100"
-                                    style={{ objectFit: "cover" }}
-                                    onError={(e) =>
-                                      (e.target.src =
-                                        "/images/document-placeholder.png")
-                                    }
-                                  />
-                                ) : (
-                                  <div className="h-100 d-flex align-items-center justify-content-center bg-white">
-                                    <span className="text-muted">
-                                      No image available
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              <small className="text-center d-block mt-1">
-                                Front Side
-                              </small>
-                            </div>
-                            <div className="flex-grow-1">
-                              <div
-                                className="document-preview border rounded overflow-hidden"
-                                style={{ height: "150px" }}
-                              >
-                                {userData.panBackImage ? (
-                                  <img
-                                    src={`${file_url}${userData.panBackImage}`}
-                                    alt="PAN Back"
-                                    className="img-fluid h-100 w-100"
-                                    style={{ objectFit: "cover" }}
-                                    onError={(e) =>
-                                      (e.target.src =
-                                        "/images/document-placeholder.png")
-                                    }
-                                  />
-                                ) : (
-                                  <div className="h-100 d-flex align-items-center justify-content-center bg-white">
-                                    <span className="text-muted">
-                                      No image available
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              <small className="text-center d-block mt-1">
-                                Back Side
-                              </small>
-                            </div>
-                          </div>
-                          <div className="d-flex gap-2">
-                            <a
-                              href={`${file_url}${userData.panFrontImage}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary w-100"
-                              disabled={!userData.panFrontImage}
-                            >
-                              <i className="ti ti-download me-1"></i> Download
-                              Front
-                            </a>
-                            <a
-                              href={`${file_url}${userData.panBackImage}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary w-100"
-                              disabled={!userData.panBackImage}
-                            >
-                              <i className="ti ti-download me-1"></i> Download
-                              Back
-                            </a>
-                          </div>
-                        </div>
+                                  >
+                                    <option value="placed">Placed</option>
+                                    <option value="processing">
+                                      Processing
+                                    </option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="cancelled">Cancelled</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  {getPaymentStatusBadge(order.paymentStatus)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Subscription Plans */}
-                <div className="card mb-4 border-0 shadow-sm">
-  <div className="card-header bg-transparent border-0 py-3">
-    <div className="d-flex justify-content-between align-items-center">
-      <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-        <i className="ti ti-crown me-2 text-primary"></i>
-        Subscription Plans
-      </h5>
-      <span className="badge bg-primary">
-        {plans.length} {plans.length === 1 ? "Plan" : "Plans"}
-      </span>
-    </div>
-  </div>
-
-  <div className="card-body pt-0">
-    {plans.length > 0 ? (
-      <div className="row g-3">
-        {plans.map((plan, index) => (
-          <div key={index} className="col-12">
-            <div
-              className={`p-3 border rounded ${
-                plan.serviceChoice === "free" ? "bg-light" : "bg-primary-light"
-              }`}
-            >
-              {/* Header */}
-              <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-2 gap-2">
-                <div>
-                  <h6 className="mb-0 fw-bold">
-                    <span
-                      className={`badge me-2 ${
-                        plan.serviceChoice === "free"
-                          ? "bg-info"
-                          : "bg-success"
-                      }`}
-                    >
-                      {plan.serviceChoice === "free"
-                        ? "Free Plan"
-                        : "Premium Plan"}
-                    </span>
-                    Plan #{index + 1}
-                  </h6>
-                  <small className="text-muted">
-                    {formatDate(plan.startDate)} to {formatDate(plan.endDate)}
-                  </small>
-                </div>
-                <span
-                  className={`badge ${
-                    plan.status === "active"
-                      ? "bg-success"
-                      : "bg-secondary"
-                  }`}
-                >
-                  {plan.status}
-                </span>
-              </div>
-
-              {/* Price & Preferences */}
-              <div className="mt-3">
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted">Delivery Preference:</span>
-                  <span className="fw-medium text-capitalize">
-                    {plan.deliveryPreference}
-                  </span>
-                </div>
-                {plan.serviceChoice !== "free" && (
-                  <div className="d-flex justify-content-between mb-2">
-                    <span className="text-muted">Total Price:</span>
-                    <span className="fw-bold">
-                      {formatPrice(plan.totalPrice)}
-                    </span>
                   </div>
                 )}
-              </div>
 
-              {/* Service Categories */}
-              {plan.freeOfferings?.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-muted small mb-1">Free Offerings:</p>
-                  <div className="d-flex flex-wrap gap-2">
-                    {plan.freeOfferings.map((service, i) => (
-                      <span key={i} className="badge bg-info">
-                        {service.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {plan.individualBusinessServices?.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-muted small mb-1">
-                    Individual Business Services:
-                  </p>
-                  <div className="d-flex flex-wrap gap-2">
-                    {plan.individualBusinessServices.map((service, i) => (
-                      <span key={i} className="badge bg-primary">
-                        {service.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {plan.businessServices?.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-muted small mb-1">Business Services:</p>
-                  <div className="d-flex flex-wrap gap-2">
-                    {plan.businessServices.map((service, i) => (
-                      <span key={i} className="badge bg-warning text-dark">
-                        {service.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {plan.institutionalServices?.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-muted small mb-1">
-                    Institutional Services:
-                  </p>
-                  <div className="d-flex flex-wrap gap-2">
-                    {plan.institutionalServices.map((service, i) => (
-                      <span key={i} className="badge bg-danger">
-                        {service.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <div className="text-center py-4">
-        <i className="ti ti-alert-circle fs-5 text-muted me-2"></i>
-        <span className="text-muted">No subscription plans found</span>
-      </div>
-    )}
-  </div>
-</div>
-
-              </div>
-
-              {/* Right Column */}
-              <div className="col-lg-4">
-                {/* Account Details */}
-                <div className="card mb-4 border-0 shadow-sm">
-                  <div className="card-header bg-transparent border-0 py-3">
-                    <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-                      <i className="ti ti-user-circle me-2 text-primary"></i>
-                      Account Details
-                    </h5>
-                  </div>
-                  <div className="card-body pt-0">
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        Verification Status
-                      </label>
-                      <div className="fw-medium">
-                        {getStatusBadge(userData.adminVerified)}
-                        
+                {/* Prescriptions Section */}
+                {userData.prescriptions?.length > 0 && (
+                  <div className="card mb-4 border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 py-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
+                          <i className="ti ti-file-prescription me-2 text-primary"></i>
+                          Prescriptions
+                        </h5>
+                        <span className="badge bg-primary">
+                          {userData.prescriptions.length}{" "}
+                          {userData.prescriptions.length === 1
+                            ? "Prescription"
+                            : "Prescriptions"}
+                        </span>
                       </div>
                     </div>
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        Account Type
-                      </label>
-                      <p className="fw-medium text-capitalize">
-                        {userData.role}
-                      </p>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        Member Since
-                      </label>
-                      <p className="fw-medium">
-                        {formatDateTime(userData.createdAt)}
-                      </p>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        Last Updated
-                      </label>
-                      <p className="fw-medium">
-                        {formatDateTime(userData.updatedAt)}
-                      </p>
-                    </div>
-                    
-                  </div>
-                </div>
 
-                {/* System Information */}
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-transparent border-0 py-3">
-                    <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-                      <i className="ti ti-device-desktop me-2 text-primary"></i>
-                      System Information
-                    </h5>
-                  </div>
-                  <div className="card-body pt-0">
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        User ID
-                      </label>
-                      <p className="fw-medium font-monospace small">
-                        {userData._id}
-                      </p>
+                    <div className="card-body pt-0">
+                      <div className="row g-3">
+                        {userData.prescriptions.map((prescription) => (
+                          <div key={prescription._id} className="col-md-12">
+                            <div className="border rounded p-3 h-100">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <h6 className="mb-0 fw-bold">
+                                  {formatDate(prescription.uploadedAt)}
+                                </h6>
+                                <a
+                                  href={`${file_url}${prescription.prescriptionFile}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="ti ti-download me-1"></i>
+                                  Download
+                                </a>
+                              </div>
+                              {prescription.notes && (
+                                <div className="mb-2">
+                                  <p className="small text-muted mb-1">
+                                    Notes:
+                                  </p>
+                                  <p className="small mb-0">
+                                    {prescription.notes}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    
-                    <div className="mb-3">
-                      <label className="form-label small mb-1">
-                        Last Login
-                      </label>
-                      <p className="fw-medium">
-                        {formatDateTime(userData.updatedAt)}
-                      </p>
+                  </div>
+                )}
+
+                {/* Favorites Section */}
+                {userData.favorites?.length > 0 && (
+                  <div className="card mb-4 border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 py-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
+                          <i className="ti ti-heart me-2 text-primary"></i>
+                          Favorites
+                        </h5>
+                        <span className="badge bg-primary">
+                          {userData.favorites.length}{" "}
+                          {userData.favorites.length === 1 ? "Item" : "Items"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="card-body pt-0">
+                      <div className="row g-3">
+                        {userData.favorites.map((favorite) => (
+                          <div key={favorite._id} className="col-md-6">
+                            <div className="border rounded p-3 h-100 d-flex gap-3">
+                              <div
+                                className="flex-shrink-0"
+                                style={{ width: "80px", height: "80px" }}
+                              >
+                                <img
+                                  src={`${file_url}${favorite.productId.images[0]}`}
+                                  alt={favorite.productId.name}
+                                  className="img-fluid rounded h-100 w-100"
+                                  style={{ objectFit: "cover" }}
+                                  onError={(e) =>
+                                    (e.target.src =
+                                      "/images/product-placeholder.png")
+                                  }
+                                />
+                              </div>
+                              <div className="flex-grow-1">
+                                <h6 className="mb-1 fw-bold">
+                                  {favorite.productId.name}
+                                </h6>
+                                <div className="d-flex gap-2 mb-1">
+                                  <span className="text-danger fw-bold">
+                                    {formatPrice(
+                                      favorite.productId.sellingPrice
+                                    )}
+                                  </span>
+                                  {favorite.productId.originalPrice >
+                                    favorite.productId.sellingPrice && (
+                                    <span className="text-muted text-decoration-line-through small">
+                                      {formatPrice(
+                                        favorite.productId.originalPrice
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="d-flex gap-1 flex-wrap">
+                                  <span className="badge bg-light text-dark small">
+                                    {favorite.productId.productType}
+                                  </span>
+                                  <span className="badge bg-light text-dark small">
+                                    {favorite.productId.frameType}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

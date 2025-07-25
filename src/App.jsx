@@ -19,10 +19,10 @@ import ProductDetail from "./componants/pages/ProductDetail";
 import EditProduct from "./componants/pages/EditProduct";
 import AddProduct from "./componants/pages/AddProduct";
 import ResearchDetails from "./componants/pages/ResearchDetails";
-import Testimonials from "./componants/pages/Testimonials";
 import Membership from "./componants/pages/Membership";
 import Transactions from "./componants/pages/Transactions";
 import Prescription from "./componants/pages/Prescription";
+import OrdersList from "./componants/pages/OrdersList";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -70,13 +70,14 @@ const App = () => {
 
             <Route path="researchDetails" element={<ResearchDetails />} />
 
-            <Route path="testimonials" element={<Testimonials />} />
 
             <Route path="membership" element={<Membership />} />
 
             <Route path="transactions" element={<Transactions />} />
 
             <Route path="prescription" element={<Prescription />} />
+
+            <Route path="ordersList" element={<OrdersList />} />
           </Route>
         ) : (
           <Route path="/*" element={<Navigate to="/login" replace />} />

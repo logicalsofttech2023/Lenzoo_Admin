@@ -226,7 +226,7 @@ const Userlist = () => {
                             </Link>
                             <div>
                               <Link to={"/userDetails"} state={{ userId: user._id }} className="fw-bold">
-                                {user.firstName} {user.middleName}{" "}
+                                {user.firstName} 
                                 {user.lastName}
                               </Link>
                               <div className="text-muted small">
