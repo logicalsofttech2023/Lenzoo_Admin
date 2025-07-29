@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -10,18 +11,7 @@ const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
-
-  const navigate = useNavigate();
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const addToggleDropdown = () => {
-    setIsAddOpen((prev) => !prev);
-  };
-
+  const [adminData , setAdminData] = useState();
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -45,6 +35,26 @@ const Header = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = () => {
+    axios
+      .get(`${import.meta.env.VITE_API_BASE_URL}getAdminDetail`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((result) => {
+        let res = result?.data?.data;
+        setAdminData(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <>
@@ -264,7 +274,6 @@ const Header = () => {
                 <span className="user-img">
                   <img
                     src={
-                      adminData.profileImage ||
                       "assets/img/profiles/avatar-01.jpg"
                     }
                     alt="User"
@@ -278,14 +287,14 @@ const Header = () => {
               {profileDropdownOpen && (
                 <div
                   className="dropdown-menu profile-dropdown show"
-                  style={{ minWidth: "200px", top: "100%", right: "0" }}
+                  style={{ position: "absolute", top: "-80px", right: "-15px" }}
                 >
                   <div className="dropdown-header">
                     <h6 className="text-overflow m-0">
-                      {adminData.name || "Admin User"}
+                      {adminData?.name || "Admin User"}
                     </h6>
                     <span className="text-muted">
-                      {adminData.email || "admin@example.com"}
+                      {adminData?.email || "admin@example.com"}
                     </span>
                   </div>
                   <Link
@@ -313,7 +322,7 @@ const Header = () => {
                 <span className="user-img">
                   <img
                     src={
-                      adminData.profileImage ||
+                      
                       "assets/img/profiles/avatar-01.jpg"
                     }
                     alt="User"
@@ -341,10 +350,10 @@ const Header = () => {
                 >
                   <div className="dropdown-header">
                     <h6 className="text-overflow m-0">
-                      {adminData.name || "Admin User"}
+                      {adminData?.name || "Admin User"}
                     </h6>
                     <span className="text-muted">
-                      {adminData.email || "admin@example.com"}
+                      {adminData?.email || "admin@example.com"}
                     </span>
                   </div>
                   <Link

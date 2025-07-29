@@ -23,6 +23,9 @@ import Membership from "./componants/pages/Membership";
 import Transactions from "./componants/pages/Transactions";
 import Prescription from "./componants/pages/Prescription";
 import OrdersList from "./componants/pages/OrdersList";
+import AppointmentList from "./componants/pages/AppointmentList";
+import Profile from "./componants/pages/Profile";
+import OrderDetail from "./componants/pages/OrderDetail";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -70,7 +73,6 @@ const App = () => {
 
             <Route path="researchDetails" element={<ResearchDetails />} />
 
-
             <Route path="membership" element={<Membership />} />
 
             <Route path="transactions" element={<Transactions />} />
@@ -78,6 +80,14 @@ const App = () => {
             <Route path="prescription" element={<Prescription />} />
 
             <Route path="ordersList" element={<OrdersList />} />
+
+            <Route path="appointmentList" element={<AppointmentList />} />
+
+            <Route path="/profile" element={<Profile />} />
+
+            <Route path="/orderDetail" element={<OrderDetail />} />
+
+
           </Route>
         ) : (
           <Route path="/*" element={<Navigate to="/login" replace />} />

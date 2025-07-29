@@ -102,8 +102,7 @@ const Faqs = () => {
 
   const containerStyle = {
     maxWidth: "800px",
-    margin: "24px auto",
-    padding: "0 16px"
+    margin: "24px",
   };
 
   const cardStyle = {

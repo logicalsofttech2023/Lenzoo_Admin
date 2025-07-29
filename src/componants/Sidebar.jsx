@@ -203,23 +203,24 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                         <span>Prescription</span>
                       </Link>
                     </li>
-                    
+                  </ul>
+                </li>
 
-                    {/* <li className={isActive("/subscribers") ? "active" : ""}>
-                      <Link to="/subscribers">
+                <li className="submenu-open">
+                  <h6 className="submenu-hdr">Appointment Management</h6>
+                  <ul>
+                    <li
+                      className={
+                        isActive("/appointmentList") ? "active" : ""
+                      }
+                    >
+                      <Link to="/appointmentList">
                         <i data-feather="box" />
-                        <span>Subscribers</span>
+                        <span>Appointments List</span>
                       </Link>
                     </li>
 
-                    <li
-                      className={isActive("/contactRequests") ? "active" : ""}
-                    >
-                      <Link to="/contactRequests">
-                        <i data-feather="box" />
-                        <span>Contact Requests</span>
-                      </Link>
-                    </li> */}
+                    
                   </ul>
                 </li>
 
