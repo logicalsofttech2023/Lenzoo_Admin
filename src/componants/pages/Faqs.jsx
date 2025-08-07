@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
-const FaqItem = React.memo(({ faq, onEdit, onToggle, onDelete }) => {
+const FaqItem = React.memo(({ faq, onEdit, onToggle, onDelete, t }) => {
   const itemStyle = {
     border: "1px solid #e0e0e0",
     borderRadius: "8px",
@@ -53,7 +54,7 @@ const FaqItem = React.memo(({ faq, onEdit, onToggle, onDelete }) => {
   return (
     <div style={itemStyle}>
       <div style={headerStyle}>
-        <button btn btn-primary px-4 py-2 d-flex align-items-center gap-2>
+        <button style={buttonStyle}>
           {faq.question}
         </button>
       </div>
@@ -64,23 +65,13 @@ const FaqItem = React.memo(({ faq, onEdit, onToggle, onDelete }) => {
             className="btn btn-primary px-4 py-2 d-flex align-items-center gap-2"
             onClick={() => onEdit(faq._id)}
           >
-            Edit
+            {t("edit")}
           </button>
-          {/* <button
-            style={{ 
-              ...baseButton, 
-              borderColor: faq.isActive ? "#ffc107" : "#198754",
-              color: faq.isActive ? "#ffc107" : "#198754"
-            }}
-            onClick={() => onToggle(faq._id, faq.isActive)}
-          >
-            {faq.isActive ? "Deactivate" : "Activate"}
-          </button> */}
           <button
             style={{ ...baseButton, borderColor: "#dc3545", color: "#dc3545" }}
             onClick={() => onDelete(faq._id)}
           >
-            Delete
+            {t("delete")}
           </button>
         </div>
       </div>
@@ -89,6 +80,7 @@ const FaqItem = React.memo(({ faq, onEdit, onToggle, onDelete }) => {
 });
 
 const Faqs = () => {
+  const { t } = useTranslation();
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -304,14 +296,14 @@ const Faqs = () => {
     }
   };
 
-  if (loading) return <div style={loadingStyle}>Loading...</div>;
-  if (error) return <div style={errorStyle}>Error: {error}</div>;
+  if (loading) return <div style={loadingStyle}>{t("loading")}</div>;
+  if (error) return <div style={errorStyle}>{t("error")}: {error}</div>;
 
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
         <div style={headerStyle}>
-          <h2 style={titleStyle}>FAQs</h2>
+          <h2 style={titleStyle}>{t("faqs")}</h2>
           <button
             className="btn btn-primary px-4 py-2 d-flex align-items-center gap-2"
             onClick={() => {
@@ -320,17 +312,17 @@ const Faqs = () => {
               setFormData({ question: "", answer: "", id: "" });
             }}
           >
-            {showForm ? "Cancel" : "Add New FAQ"}
+            {showForm ? t("cancel") : t("addNewFaq")}
           </button>
         </div>
 
         {showForm && (
           <div style={formCardStyle}>
-            <h4 style={formTitleStyle}>{isEditing ? "Edit FAQ" : "Add New FAQ"}</h4>
+            <h4 style={formTitleStyle}>{isEditing ? t("editFaq") : t("addNewFaq")}</h4>
             <form onSubmit={handleSubmit}>
               <div style={formGroupStyle}>
                 <label htmlFor="question" style={labelStyle}>
-                  Question
+                  {t("question")}
                 </label>
                 <input
                   type="text"
@@ -344,7 +336,7 @@ const Faqs = () => {
               </div>
               <div style={formGroupStyle}>
                 <label htmlFor="answer" style={labelStyle}>
-                  Answer
+                  {t("answer")}
                 </label>
                 <textarea
                   style={textareaStyle}
@@ -357,7 +349,7 @@ const Faqs = () => {
                 ></textarea>
               </div>
               <button className="btn btn-primary px-4 py-2 d-flex align-items-center gap-2" type="submit" style={submitButtonStyle}>
-                {isEditing ? "Update FAQ" : "Add FAQ"}
+                {isEditing ? t("updateFaq") : t("addFaq")}
               </button>
             </form>
           </div>
@@ -365,7 +357,7 @@ const Faqs = () => {
 
         <div>
           {faqs.length === 0 ? (
-            <div style={infoMessageStyle}>No FAQs found.</div>
+            <div style={infoMessageStyle}>{t("noFaqsFound")}</div>
           ) : (
             faqs.map((faq) => (
               <FaqItem
@@ -374,6 +366,7 @@ const Faqs = () => {
                 onEdit={handleEdit}
                 onToggle={toggleStatus}
                 onDelete={handleDelete}
+                t={t}
               />
             ))
           )}

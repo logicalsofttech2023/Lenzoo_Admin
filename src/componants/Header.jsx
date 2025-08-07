@@ -1,19 +1,25 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import user from "./user.jpg";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [openLanguage, setOpenLanguage] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [adminData , setAdminData] = useState();
+  const [adminData, setAdminData] = useState();
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+  const { i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
   };
 
   const handleLogout = () => {
@@ -55,6 +61,8 @@ const Header = () => {
         console.log(err);
       });
   };
+
+  const { t } = useTranslation();
 
   return (
     <>
@@ -99,166 +107,53 @@ const Header = () => {
           >
             {/* Search - Hidden on mobile */}
             <li
-              className="nav-item nav-searchinputs d-none d-md-block"
-              ref={dropdownRef}
-            >
-              <div className="top-nav-search">
-                <button
-                  className="responsive-search btn"
-                  onClick={() => setSearchOpen(!searchOpen)}
-                >
-                  <i className="fa fa-search" />
-                </button>
-                <div className="dropdown">
-                  <div
-                    className="searchinputs input-group"
-                    onClick={() => setSearchOpen(!searchOpen)}
-                    role="button"
-                  >
-                    <input type="text" placeholder="Search" />
-                    <div className="search-addon">
-                      <span>
-                        <i className="ti ti-search" />
-                      </span>
-                    </div>
-                    <span className="input-group-text">
-                      <kbd className="d-flex align-items-center">
-                        <img
-                          src="assets/img/icons/command.svg"
-                          alt="cmd"
-                          className="me-1"
-                        />
-                      </kbd>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </li>
-
-            {/* Notifications - Hidden on mobile */}
-            <li
               className="nav-item dropdown nav-item-box d-none d-md-block"
               ref={dropdownRef}
             >
-              <a
-                type="button"
-                className="dropdown-toggle nav-link "
-                onClick={() => setOpen(!open)}
-              >
-                <i className="ti ti-bell"></i>
-              </a>
-
-              {open && (
-                <div
-                  className="dropdown-menu notifications show"
-                  style={{ minWidth: "350px", top: " -220%", right: "-15px" }}
-                >
-                  <div className="topnav-dropdown-header">
-                    <h5 className="notification-title">Notifications</h5>
-                    <button className="clear-noti btn btn-link p-0">
-                      Mark all as read
-                    </button>
-                  </div>
-                  <div className="noti-content">
-                    <ul className="notification-list">
-                      <li className="notification-message">
-                        <Link to="/activities">
-                          <div className="media d-flex">
-                            <span className="avatar flex-shrink-0">
-                              <img
-                                alt="Img"
-                                src="assets/img/profiles/avatar-13.jpg"
-                              />
-                            </span>
-                            <div className="flex-grow-1">
-                              <p className="noti-details">
-                                <span className="noti-title">James Kirwin</span>{" "}
-                                confirmed his order. Order No: #78901. Estimated
-                                delivery: 2 days
-                              </p>
-                              <p className="noti-time">4 mins ago</p>
-                            </div>
-                          </div>
-                        </Link>
-                      </li>
-                      <li className="notification-message">
-                        <Link to="/activities">
-                          <div className="media d-flex">
-                            <span className="avatar flex-shrink-0">
-                              <img
-                                alt="Img"
-                                src="assets/img/profiles/avatar-03.jpg"
-                              />
-                            </span>
-                            <div className="flex-grow-1">
-                              <p className="noti-details">
-                                <span className="noti-title">Leo Kelly</span>{" "}
-                                cancelled his order scheduled for 17 Jan 2025
-                              </p>
-                              <p className="noti-time">10 mins ago</p>
-                            </div>
-                          </div>
-                        </Link>
-                      </li>
-                      <li className="notification-message">
-                        <Link to="/activities" className="recent-msg">
-                          <div className="media d-flex">
-                            <span className="avatar flex-shrink-0">
-                              <img
-                                alt="Img"
-                                src="assets/img/profiles/avatar-17.jpg"
-                              />
-                            </span>
-                            <div className="flex-grow-1">
-                              <p className="noti-details">
-                                Payment of $50 received for Order #67890 from{" "}
-                                <span className="noti-title">
-                                  Antonio Engle
-                                </span>
-                              </p>
-                              <p className="noti-time">05 mins ago</p>
-                            </div>
-                          </div>
-                        </Link>
-                      </li>
-                      <li className="notification-message">
-                        <Link to="/activities" className="recent-msg">
-                          <div className="media d-flex">
-                            <span className="avatar flex-shrink-0">
-                              <img
-                                alt="Img"
-                                src="assets/img/profiles/avatar-02.jpg"
-                              />
-                            </span>
-                            <div className="flex-grow-1">
-                              <p className="noti-details">
-                                <span className="noti-title">Andrea</span>{" "}
-                                confirmed his order. Order No: #73401. Estimated
-                                delivery: 3 days
-                              </p>
-                              <p className="noti-time">4 mins ago</p>
-                            </div>
-                          </div>
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="topnav-dropdown-footer d-flex align-items-center gap-3">
-                    <button
-                      className="btn btn-secondary btn-md w-100"
-                      onClick={() => setOpen(false)}
+              <div className="top-nav-search">
+                <div>
+                  <select
+                    value={i18n.language}
+                    onChange={(e) => changeLanguage(e.target.value)}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: "4px",
+                      color: "#333",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      outline: "none",
+                      transition: "all 0.3s ease",
+                      appearance: "none",
+                      paddingRight: "20px",
+                      backgroundImage:
+                        "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 8px center",
+                      backgroundSize: "16px",
+                      border: "transparent",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.target.style.borderColor = "#007bff")
+                    }
+                    onMouseOut={(e) => (e.target.style.borderColor = "#ccc")}
+                    onFocus={(e) => (e.target.style.borderColor = "#007bff")}
+                    onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+                  >
+                    <option
+                      value="en"
+                      style={{ backgroundColor: "#fff", color: "#333" }}
                     >
-                      Cancel
-                    </button>
-                    <Link
-                      to="/activities"
-                      className="btn btn-primary btn-md w-100"
+                      English
+                    </option>
+                    <option
+                      value="pt"
+                      style={{ backgroundColor: "#fff", color: "#333" }}
                     >
-                      View all
-                    </Link>
-                  </div>
+                      Português
+                    </option>
+                  </select>
                 </div>
-              )}
+              </div>
             </li>
 
             {/* Profile Dropdown - Desktop - Hidden on mobile */}
@@ -273,9 +168,7 @@ const Header = () => {
               >
                 <span className="user-img">
                   <img
-                    src={
-                      "assets/img/profiles/avatar-01.jpg"
-                    }
+                    src={user}
                     alt="User"
                     width="36"
                     height="36"
@@ -302,11 +195,11 @@ const Header = () => {
                     className="dropdown-item"
                     onClick={() => setProfileDropdownOpen(false)}
                   >
-                    <i className="ti ti-user me-2"></i> View Profile
+                    <i className="ti ti-user me-2"></i> {t("View Profile")}
                   </Link>
                   <div className="dropdown-divider"></div>
                   <button className="dropdown-item" onClick={handleLogout}>
-                    <i className="ti ti-logout me-2"></i> Logout
+                    <i className="ti ti-logout me-2"></i> {t("logout")}
                   </button>
                 </div>
               )}
@@ -321,10 +214,7 @@ const Header = () => {
               >
                 <span className="user-img">
                   <img
-                    src={
-                      
-                      "assets/img/profiles/avatar-01.jpg"
-                    }
+                    src={"assets/img/profiles/avatar-01.jpg"}
                     alt="User"
                     width="36"
                     height="36"
@@ -374,7 +264,7 @@ const Header = () => {
                       textDecoration: "none",
                     }}
                   >
-                    <i className="ti ti-user me-2"></i> View Profile
+                    <i className="ti ti-user me-2"></i>{t("View Profile")}
                   </Link>
                   <div
                     className="dropdown-divider"
@@ -402,7 +292,7 @@ const Header = () => {
                       cursor: "pointer",
                     }}
                   >
-                    <i className="ti ti-logout me-2"></i> Logout
+                    <i className="ti ti-logout me-2"></i>{t("logout")}
                   </button>
                 </div>
               )}

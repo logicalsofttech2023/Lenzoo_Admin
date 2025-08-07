@@ -4,8 +4,10 @@ import Swal from "sweetalert2";
 import { FiEdit2, FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { ColorRing } from "react-loader-spinner";
+import { useTranslation } from "react-i18next";
 
 const Membership = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const [memberships, setMemberships] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,11 +49,11 @@ const Membership = () => {
         setMemberships(response.data.membership);
         setTotalCount(response.data.membership.length);
       } else {
-        setError(response.data.message || "Failed to fetch memberships");
+        setError(response.data.message || t("operationFailed"));
       }
     } catch (error) {
       console.error("Error fetching memberships:", error);
-      setError("Error fetching memberships. Please try again later.");
+      setError(t("errorOccurred"));
     } finally {
       setLoading(false);
     }
@@ -140,24 +142,24 @@ const Membership = () => {
       if (response.data.status) {
         Swal.fire({
           icon: "success",
-          title: "Success",
-          text: "Membership added successfully",
+          title: t("success"),
+          text: t("membershipAdded"),
           showConfirmButton: true,
         });
         resetForm();
         fetchMemberships();
         setShowForm(false);
       } else {
-        throw new Error(response.data.message || "Operation failed");
+        throw new Error(response.data.message || t("operationFailed"));
       }
     } catch (error) {
       console.error("Error adding membership:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
+        title: t("error"),
         text:
           error.response?.data?.message ||
-          "An error occurred while processing your request",
+          t("errorOccurred"),
       });
     } finally {
       setIsSubmitting(false);
@@ -190,24 +192,24 @@ const Membership = () => {
       if (response.data.status) {
         Swal.fire({
           icon: "success",
-          title: "Success",
-          text: "Membership updated successfully",
+          title: t("success"),
+          text: t("membershipUpdated"),
           showConfirmButton: true,
         });
         resetForm();
         fetchMemberships();
         setShowForm(false);
       } else {
-        throw new Error(response.data.message || "Operation failed");
+        throw new Error(response.data.message || t("operationFailed"));
       }
     } catch (error) {
       console.error("Error updating membership:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
+        title: t("error"),
         text:
           error.response?.data?.message ||
-          "An error occurred while processing your request",
+          t("errorOccurred"),
       });
     } finally {
       setIsSubmitting(false);
@@ -217,13 +219,13 @@ const Membership = () => {
   const handleDeleteMembership = async (id) => {
     try {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: t("deleteConfirmationTitle"),
+        text: t("deleteConfirmationText"),
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: t("deleteConfirmationConfirm"),
       });
 
       if (result.isConfirmed) {
@@ -235,13 +237,13 @@ const Membership = () => {
         });
 
         if (response.status === 200) {
-          Swal.fire("Deleted!", "Membership has been deleted.", "success");
+          Swal.fire(t("deletedSuccess"), t("membershipDeleted"), "success");
           fetchMemberships();
         }
       }
     } catch (error) {
       console.error("Error deleting membership:", error);
-      Swal.fire("Error!", "Failed to delete membership.", "error");
+      Swal.fire(t("error"), t("failedToDelete"), "error");
     }
   };
 
@@ -288,8 +290,8 @@ const Membership = () => {
       console.error("Error loading membership details:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Failed to load membership details. Please try again.",
+        title: t("error"),
+        text: t("failedToLoad"),
       });
     }
   };
@@ -323,7 +325,7 @@ const Membership = () => {
     <div className="container mt-4">
       <div className="card p-4 shadow-sm">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2 className="mb-0">Membership Plans</h2>
+          <h2 className="mb-0">{t("membershipPlans")}</h2>
           <button
             className="btn btn-primary"
             onClick={() => {
@@ -332,7 +334,7 @@ const Membership = () => {
             }}
           >
             <FiPlus className="me-2" />
-            Add New Membership
+            {t("addNewMembership")}
           </button>
         </div>
 
@@ -343,7 +345,7 @@ const Membership = () => {
           >
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label className="form-label">Title</label>
+                <label className="form-label">{t("title")}</label>
                 <select
                   className="form-select"
                   name="title"
@@ -357,20 +359,20 @@ const Membership = () => {
                 </select>
               </div>
               <div className="col-md-6 mb-3">
-                <label className="form-label">Description</label>
+                <label className="form-label">{t("description")}</label>
                 <input
                   type="text"
                   className="form-control"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Enter description"
+                  placeholder={t("description")}
                   required
                 />
               </div>
 
               <div className="col-md-4 mb-3">
-                <label className="form-label">Plan Type</label>
+                <label className="form-label">{t("planType")}</label>
                 <select
                   className="form-select"
                   name="planType"
@@ -381,21 +383,21 @@ const Membership = () => {
                   }}
                   required
                 >
-                  <option value="monthly">Monthly</option>
-                  <option value="6months">6 Months</option>
-                  <option value="1year">1 Year</option>
+                  <option value="monthly">{t("monthly")}</option>
+                  <option value="6months">{t("6months")}</option>
+                  <option value="1year">{t("1year")}</option>
                 </select>
               </div>
 
               <div className="col-md-4 mb-3">
-                <label className="form-label">Price</label>
+                <label className="form-label">{t("price")}</label>
                 <input
                   type="number"
                   className="form-control"
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  placeholder="Enter price"
+                  placeholder={t("price")}
                   min="0"
                   step="0.01"
                   required
@@ -403,7 +405,7 @@ const Membership = () => {
               </div>
 
               <div className="col-md-4 mb-3">
-                <label className="form-label">Duration (Days)</label>
+                <label className="form-label">{t("durationDays")}</label>
                 <input
                   type="number"
                   className="form-control"
@@ -416,7 +418,7 @@ const Membership = () => {
               </div>
 
               <div className="col-md-6 mb-3">
-                <label className="form-label">Status</label>
+                <label className="form-label">{t("status")}</label>
                 <select
                   className="form-select"
                   name="status"
@@ -424,8 +426,8 @@ const Membership = () => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="active">Active</option>
-                  <option value="expired">Expired</option>
+                  <option value="active">{t("active")}</option>
+                  <option value="expired">{t("expired")}</option>
                 </select>
               </div>
 
@@ -440,13 +442,13 @@ const Membership = () => {
                     id="isRecurringCheck"
                   />
                   <label className="form-check-label" htmlFor="isRecurringCheck">
-                    Recurring Payment
+                    {t("recurringPayment")}
                   </label>
                 </div>
               </div>
 
               <div className="col-12 mb-3">
-                <label className="form-label">Benefits</label>
+                <label className="form-label">{t("benefits")}</label>
                 {benefits.map((benefit, index) => (
                   <div key={index} className="input-group mb-2">
                     <input
@@ -454,7 +456,7 @@ const Membership = () => {
                       className="form-control"
                       value={benefit}
                       onChange={(e) => handleBenefitChange(index, e.target.value)}
-                      placeholder={`Benefit ${index + 1}`}
+                      placeholder={`${t("benefits")} ${index + 1}`}
                     />
                     <button
                       type="button"
@@ -470,7 +472,7 @@ const Membership = () => {
                   className="btn btn-sm btn-outline-secondary"
                   onClick={addBenefitField}
                 >
-                  <FiPlus /> Add Benefit
+                  <FiPlus /> {t("addBenefit")}
                 </button>
               </div>
             </div>
@@ -483,11 +485,11 @@ const Membership = () => {
               >
                 {isSubmitting
                   ? isEditing
-                    ? "Updating..."
-                    : "Creating..."
+                    ? t("updating")
+                    : t("creating")
                   : isEditing
-                  ? "Update Membership"
-                  : "Create Membership"}
+                  ? t("updateMembership")
+                  : t("createMembership")}
               </button>
               <button
                 className="btn btn-secondary"
@@ -495,7 +497,7 @@ const Membership = () => {
                 onClick={resetForm}
                 disabled={isSubmitting}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </form>
@@ -505,7 +507,7 @@ const Membership = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Search by title"
+            placeholder={t("searchByTitle")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -518,14 +520,14 @@ const Membership = () => {
           <table className="table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Plan Type</th>
-                <th>Price</th>
-                <th>Duration</th>
-                <th>Recurring</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t("title")}</th>
+                <th>{t("description")}</th>
+                <th>{t("planType")}</th>
+                <th>{t("price")}</th>
+                <th>{t("duration")}</th>
+                <th>{t("recurring")}</th>
+                <th>{t("status")}</th>
+                <th>{t("actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -552,7 +554,7 @@ const Membership = () => {
               ) : memberships.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center py-4">
-                    No memberships found
+                    {t("noMembershipsFound")}
                   </td>
                 </tr>
               ) : (
@@ -560,19 +562,19 @@ const Membership = () => {
                   <tr key={membership._id}>
                     <td>{membership.title}</td>
                     <td>{membership.description}</td>
-                    <td>{membership.planType}</td>
+                    <td>{t(membership.planType)}</td>
                     <td>₹{membership.price}</td>
-                    <td>{membership.durationInDays} days</td>
+                    <td>{membership.durationInDays} {t("days")}</td>
                     <td>
                       {membership.isRecurring ? (
-                        <span className="badge bg-success">Yes</span>
+                        <span className="badge bg-success">{t("yes")}</span>
                       ) : (
-                        <span className="badge bg-secondary">No</span>
+                        <span className="badge bg-secondary">{t("no")}</span>
                       )}
                     </td>
                     <td>
                       <span className={`badge ${membership.status === 'active' ? 'bg-success' : 'bg-warning'}`}>
-                        {membership.status}
+                        {t(membership.status)}
                       </span>
                     </td>
                     <td>
@@ -601,8 +603,8 @@ const Membership = () => {
         {!loading && totalCount > limit && (
           <div className="d-flex justify-content-between align-items-center mt-3">
             <p className="mb-0">
-              Showing {(page - 1) * limit + 1} -{" "}
-              {Math.min(page * limit, totalCount)} of {totalCount}
+              {t("showing")} {(page - 1) * limit + 1} -{" "}
+              {Math.min(page * limit, totalCount)} {t("of")} {totalCount}
             </p>
 
             <div className="btn-group">
@@ -611,14 +613,14 @@ const Membership = () => {
                 disabled={page === 1}
                 onClick={() => setPage((prev) => prev - 1)}
               >
-                Previous
+                {t("previous")}
               </button>
               <button
                 className="btn btn-outline-primary"
                 disabled={page * limit >= totalCount}
                 onClick={() => setPage((prev) => prev + 1)}
               >
-                Next
+                {t("next")}
               </button>
             </div>
           </div>

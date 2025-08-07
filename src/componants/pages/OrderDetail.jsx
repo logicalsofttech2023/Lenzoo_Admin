@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+
 import { ColorRing } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 const OrderDetail = () => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const  orderId  = location.state.orderId;
+  const orderId = location.state.orderId;
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState(null);
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
+  const [isUpdate, setIsUpdate] = useState(false);
 
   const fetchOrderDetails = async () => {
     try {
@@ -26,7 +31,6 @@ const OrderDetail = () => {
       );
 
       console.log(response.data);
-      
 
       if (!response.data?.data) {
         throw new Error("No order data found");
@@ -36,7 +40,7 @@ const OrderDetail = () => {
     } catch (error) {
       console.error("Error fetching order details:", error);
       toast.error(error.message || "Failed to fetch order details");
-    //   navigate("/orders");
+      //   navigate("/orders");
     } finally {
       setLoading(false);
     }
@@ -44,6 +48,7 @@ const OrderDetail = () => {
 
   const updateOrderStatus = async (newStatus) => {
     try {
+      setIsUpdate(true);
       const response = await axios.post(
         `${base_url}updateOrderStatus`,
         {
@@ -57,9 +62,16 @@ const OrderDetail = () => {
         }
       );
 
-      if (response.data.success) {
-        toast.success("Order status updated successfully");
-        fetchOrderDetails(); // Refresh the data
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Order status updated successfully",
+          showConfirmButton: true,
+        }).then(() => {
+          fetchOrderDetails();
+          setIsUpdate(false);
+        });
       } else {
         throw new Error(
           response.data.message || "Failed to update order status"
@@ -67,16 +79,14 @@ const OrderDetail = () => {
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error(error.message || "Failed to update order status");
+      setIsUpdate(false);
     }
   };
 
   useEffect(() => {
-    console.log(orderId);
-    
     if (!orderId) {
       toast.error("No order ID provided");
-    //   navigate("/ordersList");
+      //   navigate("/ordersList");
       return;
     }
     fetchOrderDetails();
@@ -175,14 +185,14 @@ const OrderDetail = () => {
         <div className="page-header">
           <div className="add-item d-flex justify-content-between align-items-center w-100">
             <div className="page-title">
-              <h4 className="fw-bold">Order Details</h4>
-              <h6 className="text-muted">View and manage order information</h6>
+              <h4 className="fw-bold">{t("order_details")}</h4>
+              <h6 className="text-muted">{t("view_and_manage")}</h6>
             </div>
             <button
               onClick={() => navigate(-1)}
               className="btn btn-outline-secondary btn-sm"
             >
-              <i className="ti ti-arrow-left me-1"></i> Back
+              <i className="ti ti-arrow-left me-1"></i> {t("back")}
             </button>
           </div>
         </div>
@@ -194,26 +204,30 @@ const OrderDetail = () => {
               <div className="col-md-7">
                 <div className="card border-0 shadow-sm mb-3">
                   <div className="card-header bg-transparent border-0">
-                    <h5 className="fw-bold mb-0">Order Information</h5>
+                    <h5 className="fw-bold mb-0">{t("order_information")}</h5>
                   </div>
                   <div className="card-body">
                     <div className="row">
                       <div className="col-6">
-                        <p className="text-muted small mb-1">Order ID</p>
+                        <p className="text-muted small mb-1">{t("order_id")}</p>
                         <p className="fw-bold">{orderData.orderId}</p>
                       </div>
-                      <div className="col-6">
-                        <p className="text-muted small mb-1">Order Date</p>
-                        <p className="fw-bold">{formatDate(orderData.createdAt)}</p>
+                      <div className="col-6 text-end">
+                        <p className="text-muted small mb-1">{t("order_date")}</p>
+                        <p className="fw-bold">
+                          {formatDate(orderData.createdAt)}
+                        </p>
                       </div>
                       <div className="col-6">
-                        <p className="text-muted small mb-1">Order Status</p>
+                        <p className="text-muted small mb-1">{t("order_status")}</p>
                         <div className="d-flex align-items-center gap-2">
                           {getOrderStatusBadge(orderData.orderStatus)}
+
                           <select
                             className="form-select form-select-sm w-auto"
                             value={orderData.orderStatus}
                             onChange={(e) => updateOrderStatus(e.target.value)}
+                            disabled={isUpdate} // disable while updating
                           >
                             <option value="placed">Placed</option>
                             <option value="processing">Processing</option>
@@ -221,14 +235,26 @@ const OrderDetail = () => {
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                           </select>
+
+                          {isUpdate && (
+                            <div
+                              className="spinner-border spinner-border-sm text-primary"
+                              role="status"
+                            >
+                              <span className="visually-hidden">
+                                {t("updating")}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="col-6">
-                        <p className="text-muted small mb-1">Payment Status</p>
+
+                      <div className="col-6 text-end">
+                        <p className="text-muted small mb-1">{t("payment_status")}</p>
                         <p>{getPaymentStatusBadge(orderData.paymentStatus)}</p>
                       </div>
                       <div className="col-12">
-                        <p className="text-muted small mb-1">Total Amount</p>
+                        <p className="text-muted small mb-1">{t("total_amount")}</p>
                         <h4 className="fw-bold text-primary">
                           {formatPrice(orderData.totalAmount)}
                         </h4>
@@ -241,7 +267,7 @@ const OrderDetail = () => {
               <div className="col-md-5">
                 <div className="card border-0 shadow-sm">
                   <div className="card-header bg-transparent border-0">
-                    <h5 className="fw-bold mb-0">Shipping Information</h5>
+                    <h5 className="fw-bold mb-0">{t("shipping_information")}</h5>
                   </div>
                   <div className="card-body">
                     <div className="mb-2">
@@ -252,20 +278,18 @@ const OrderDetail = () => {
                         {orderData.shippingAddress?.addressType}
                       </p>
                     </div>
-                    
+
                     <p className="mb-1">{orderData.shippingAddress?.address}</p>
-                    <p className="mb-1">
-                      {orderData.shippingAddress?.pincode}
-                    </p>
+                    <p className="mb-1">{orderData.shippingAddress?.pincode}</p>
                     <div className="d-flex gap-3 mt-2">
                       <div>
-                        <p className="text-muted small mb-1">Phone</p>
+                        <p className="text-muted small mb-1">{t("phone")}</p>
                         <p className="mb-0">
                           {orderData.shippingAddress?.phone}
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted small mb-1">Email</p>
+                        <p className="text-muted small mb-1">{t("email")}</p>
                         <p className="mb-0">
                           {orderData.shippingAddress?.email}
                         </p>
@@ -279,17 +303,17 @@ const OrderDetail = () => {
             {/* Order Items */}
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-transparent border-0">
-                <h5 className="fw-bold mb-0">Order Items</h5>
+                <h5 className="fw-bold mb-0">{t("order_items")}</h5>
               </div>
               <div className="card-body">
                 <div className="table-responsive">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
+                        <th>{t("product")}</th>
+                        <th>{t("price")}</th>
+                        <th>{t("quantity")}</th>
+                        <th>{t("subtotal")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -341,7 +365,7 @@ const OrderDetail = () => {
                     <tfoot>
                       <tr>
                         <td colSpan="3" className="text-end fw-bold">
-                          Total
+                          {t("total_amount")}
                         </td>
                         <td className="fw-bold text-primary">
                           {formatPrice(orderData.totalAmount)}
@@ -379,7 +403,7 @@ const OrderDetail = () => {
                         <div className="col-md-6">
                           <div className="mb-3">
                             <p className="text-muted small mb-1">
-                              Original Price
+                              {t("original_price")}
                             </p>
                             <p className="text-decoration-line-through">
                               {formatPrice(item.productId.originalPrice)}
@@ -389,7 +413,7 @@ const OrderDetail = () => {
                         <div className="col-md-6">
                           <div className="mb-3">
                             <p className="text-muted small mb-1">
-                              Selling Price
+                              {t("selling_price")}
                             </p>
                             <h5 className="text-danger">
                               {formatPrice(item.productId.sellingPrice)}
@@ -400,26 +424,26 @@ const OrderDetail = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">Frame Type</p>
+                            <p className="text-muted small mb-1">{t("frame_type")}</p>
                             <p>{item.productId.frameType}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">Frame Shape</p>
+                            <p className="text-muted small mb-1">{t("frame_shape")}</p>
                             <p>{item.productId.frameShape}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">Frame Size</p>
+                            <p className="text-muted small mb-1">{t("frame_size")}</p>
                             <p>{item.productId.frameSize}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
                             <p className="text-muted small mb-1">
-                              Suitable For
+                              {t("suitable_for")}
                             </p>
                             <p>{item.productId.suitableFor.join(", ")}</p>
                           </div>
@@ -427,14 +451,14 @@ const OrderDetail = () => {
                         <div className="col-md-6">
                           <div className="mb-3">
                             <p className="text-muted small mb-1">
-                              Pupillary Distance
+                              {t("pupillary_distance")}
                             </p>
                             <p>{item.productId.pupillaryDistance}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">Face Shape</p>
+                            <p className="text-muted small mb-1">{t("face_shape")}</p>
                             <p>{item.productId.faceShape}</p>
                           </div>
                         </div>

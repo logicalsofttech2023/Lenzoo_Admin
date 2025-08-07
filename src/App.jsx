@@ -26,6 +26,11 @@ import OrdersList from "./componants/pages/OrdersList";
 import AppointmentList from "./componants/pages/AppointmentList";
 import Profile from "./componants/pages/Profile";
 import OrderDetail from "./componants/pages/OrderDetail";
+import CenterList from "./componants/pages/CenterList";
+import EditCenter from "./componants/pages/EditCenter";
+import CouponList from "./componants/pages/CouponList";
+import AddCoupon from "./componants/pages/AddCoupon"
+import EditCoupon from "./componants/pages/EditCoupon";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -86,6 +91,17 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
 
             <Route path="/orderDetail" element={<OrderDetail />} />
+
+            <Route path="/centerList" element={<CenterList />} />
+
+            <Route path="/editCenter" element={<EditCenter />} />
+
+            <Route path="/couponList" element={<CouponList />} />
+
+
+            <Route path="/addCoupon" element={<AddCoupon />} />
+
+            <Route path="/editCoupon" element={<EditCoupon />} />
 
 
           </Route>

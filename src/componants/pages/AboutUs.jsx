@@ -12,8 +12,10 @@ import {
 import draftToHtml from "draftjs-to-html";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { useTranslation } from "react-i18next";
 
 const AboutUs = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
 
@@ -49,11 +51,11 @@ const AboutUs = () => {
         );
         setEditorState(EditorState.createWithContent(contentState));
       } else {
-        setError("No About Us content found");
+        setError(t("noContentFound"));
       }
     } catch (error) {
       console.error("Error fetching About Us content:", error);
-      setError("Error fetching content");
+      setError(t("errorFetchingContent"));
     } finally {
       setLoading(false);
     }
@@ -96,21 +98,21 @@ const AboutUs = () => {
       if (response.data.status) {
         Swal.fire({
           icon: "success",
-          title: "Updated",
-          text: "About Us updated successfully",
+          title: t("updated"),
+          text: t("aboutUsUpdated"),
           timer: 2000,
           showConfirmButton: false,
         });
         fetchPolicyData();
       } else {
-        throw new Error(response.data.message || "Update failed");
+        throw new Error(response.data.message || t("updateFailed"));
       }
     } catch (error) {
       console.error("Submit error:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.message || "Something went wrong",
+        title: t("error"),
+        text: error.message || t("somethingWentWrong"),
       });
     } finally {
       setIsSubmitting(false);
@@ -149,7 +151,7 @@ const AboutUs = () => {
     return (
       <div className="d-flex justify-content-center mt-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("loading")}</span>
         </div>
       </div>
     );
@@ -161,7 +163,7 @@ const AboutUs = () => {
 
   if (!policyData) {
     return (
-      <div className="alert alert-info mt-3">No About Us content found</div>
+      <div className="alert alert-info mt-3">{t("noContentFound")}</div>
     );
   }
 
@@ -169,18 +171,18 @@ const AboutUs = () => {
     <div className="container mt-4">
       <div className="card p-4 shadow-sm">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">About Us</h2>
+          <h2 className="mb-0">{t("aboutUs")}</h2>
           <button 
             className="btn btn-outline-primary d-flex align-items-center gap-2"
             onClick={togglePreview}
           >
             {previewMode ? (
               <>
-                <FiEdit /> Edit Mode
+                <FiEdit /> {t("editMode")}
               </>
             ) : (
               <>
-                <FiEye /> Preview Mode
+                <FiEye /> {t("previewMode")}
               </>
             )}
           </button>
@@ -193,7 +195,7 @@ const AboutUs = () => {
                 <div className="card-body text-center">
                   <img
                     src={`${file_url}${policyData.image}`}
-                    alt="About Us"
+                    alt={t("aboutUs")}
                     className="img-fluid rounded"
                     style={{ 
                       maxHeight: "400px", 
@@ -208,7 +210,7 @@ const AboutUs = () => {
                       onClick={handleDownload}
                     >
                       <FiDownload />
-                      Download Image
+                      {t("downloadImage")}
                     </button>
                   </div>
                 </div>
@@ -217,7 +219,7 @@ const AboutUs = () => {
 
             <div className="card">
               <div className="card-body">
-                <h4 className="card-title mb-4">About Us Content</h4>
+                <h4 className="card-title mb-4">{t("aboutUsContent")}</h4>
                 <div
                   className="content-preview"
                   style={{
@@ -232,7 +234,7 @@ const AboutUs = () => {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="form-label fw-bold">Description</label>
+              <label className="form-label fw-bold">{t("description")}</label>
               <div className="border rounded overflow-hidden">
                 <Editor
                   editorState={editorState}
@@ -240,7 +242,7 @@ const AboutUs = () => {
                   wrapperClassName="p-0"
                   editorClassName="px-3 py-2"
                   onEditorStateChange={setEditorState}
-                  placeholder="Write About Us content here..."
+                  placeholder={t("editorPlaceholder")}
                   toolbar={{
                     options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'link', 'emoji', 'image', 'remove', 'history'],
                   }}
@@ -249,7 +251,7 @@ const AboutUs = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label fw-bold">Upload Image</label>
+              <label className="form-label fw-bold">{t("uploadImage")}</label>
               <div className="card border">
                 <div className="card-body">
                   <input
@@ -260,7 +262,7 @@ const AboutUs = () => {
                   />
                   {fileName && (
                     <div className="mt-2 text-muted">
-                      <small>Selected file: {fileName}</small>
+                      <small>{t("selectedFile")}: {fileName}</small>
                     </div>
                   )}
                 </div>
@@ -276,10 +278,10 @@ const AboutUs = () => {
                 {isSubmitting ? (
                   <>
                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Updating...
+                    {t("updating")}...
                   </>
                 ) : (
-                  "Update About Us"
+                  t("updateAboutUs")
                 )}
               </button>
               <button
@@ -288,7 +290,7 @@ const AboutUs = () => {
                 onClick={resetForm}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("reset")}
               </button>
             </div>
           </form>

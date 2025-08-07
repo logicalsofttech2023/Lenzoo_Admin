@@ -12,8 +12,10 @@ import {
 import draftToHtml from "draftjs-to-html";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { useTranslation } from "react-i18next";
 
 const PrivacyPolicy = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
 
@@ -49,11 +51,11 @@ const PrivacyPolicy = () => {
         );
         setEditorState(EditorState.createWithContent(contentState));
       } else {
-        setError("No Privacy Policy content found");
+        setError(t("noPrivacyPolicyFound"));
       }
     } catch (error) {
       console.error("Error fetching Privacy Policy content:", error);
-      setError("Error fetching content");
+      setError(t("errorFetchingContent"));
     } finally {
       setLoading(false);
     }
@@ -96,20 +98,20 @@ const PrivacyPolicy = () => {
       if (response.data.status) {
         Swal.fire({
           icon: "success",
-          title: "Updated",
-          text: "Privacy Policy updated successfully",
+          title: t("updated"),
+          text: t("privacyPolicyUpdated"),
           showConfirmButton: true,
         });
         fetchPolicyData();
       } else {
-        throw new Error(response.data.message || "Update failed");
+        throw new Error(response.data.message || t("updateFailed"));
       }
     } catch (error) {
       console.error("Submit error:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.message || "Something went wrong",
+        title: t("error"),
+        text: error.message || t("somethingWentWrong"),
       });
     } finally {
       setIsSubmitting(false);
@@ -148,7 +150,7 @@ const PrivacyPolicy = () => {
     return (
       <div className="d-flex justify-content-center mt-5">
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("loading")}</span>
         </div>
       </div>
     );
@@ -160,7 +162,7 @@ const PrivacyPolicy = () => {
 
   if (!policyData) {
     return (
-      <div className="alert alert-info mt-3">No Privacy Policy content found</div>
+      <div className="alert alert-info mt-3">{t("noPrivacyPolicyFound")}</div>
     );
   }
 
@@ -168,18 +170,18 @@ const PrivacyPolicy = () => {
     <div className="container mt-4">
       <div className="card p-4 shadow-sm">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">Privacy Policy</h2>
+          <h2 className="mb-0">{t("privacyPolicy")}</h2>
           <button 
             className="btn btn-outline-primary d-flex align-items-center gap-2"
             onClick={togglePreview}
           >
             {previewMode ? (
               <>
-                <FiEdit /> Edit Mode
+                <FiEdit /> {t("editMode")}
               </>
             ) : (
               <>
-                <FiEye /> Preview Mode
+                <FiEye /> {t("previewMode")}
               </>
             )}
           </button>
@@ -192,7 +194,7 @@ const PrivacyPolicy = () => {
                 <div className="card-body text-center">
                   <img
                     src={`${file_url}${policyData.image}`}
-                    alt="Privacy Policy"
+                    alt={t("privacyPolicy")}
                     className="img-fluid rounded"
                     style={{ 
                       maxHeight: "400px", 
@@ -207,7 +209,7 @@ const PrivacyPolicy = () => {
                       onClick={handleDownload}
                     >
                       <FiDownload />
-                      Download Image
+                      {t("downloadImage")}
                     </button>
                   </div>
                 </div>
@@ -216,7 +218,7 @@ const PrivacyPolicy = () => {
 
             <div className="card">
               <div className="card-body">
-                <h4 className="card-title mb-4">Privacy Policy Content</h4>
+                <h4 className="card-title mb-4">{t("privacyPolicyContent")}</h4>
                 <div
                   className="content-preview"
                   style={{
@@ -231,7 +233,7 @@ const PrivacyPolicy = () => {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="form-label fw-bold">Description</label>
+              <label className="form-label fw-bold">{t("description")}</label>
               <div className="border rounded overflow-hidden">
                 <Editor
                   editorState={editorState}
@@ -239,7 +241,7 @@ const PrivacyPolicy = () => {
                   wrapperClassName="p-0"
                   editorClassName="px-3 py-2"
                   onEditorStateChange={setEditorState}
-                  placeholder="Write Privacy Policy content here..."
+                  placeholder={t("privacyPolicyPlaceholder")}
                   toolbar={{
                     options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'link', 'emoji', 'image', 'remove', 'history'],
                   }}
@@ -248,7 +250,7 @@ const PrivacyPolicy = () => {
             </div>
 
             <div className="mb-4">
-              <label className="form-label fw-bold">Upload Image</label>
+              <label className="form-label fw-bold">{t("uploadImage")}</label>
               <div className="card border">
                 <div className="card-body">
                   <input
@@ -259,7 +261,7 @@ const PrivacyPolicy = () => {
                   />
                   {fileName && (
                     <div className="mt-2 text-muted">
-                      <small>Selected file: {fileName}</small>
+                      <small>{t("selectedFile")}: {fileName}</small>
                     </div>
                   )}
                 </div>
@@ -275,10 +277,10 @@ const PrivacyPolicy = () => {
                 {isSubmitting ? (
                   <>
                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Updating...
+                    {t("updating")}...
                   </>
                 ) : (
-                  "Update Privacy Policy"
+                  t("updatePrivacyPolicy")
                 )}
               </button>
               <button
@@ -287,7 +289,7 @@ const PrivacyPolicy = () => {
                 onClick={resetForm}
                 disabled={isSubmitting}
               >
-                Reset
+                {t("reset")}
               </button>
             </div>
           </form>

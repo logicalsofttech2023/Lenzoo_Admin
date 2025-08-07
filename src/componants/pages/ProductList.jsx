@@ -5,8 +5,10 @@ import Swal from "sweetalert2";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
+import { useTranslation } from "react-i18next";
 
 const ProductList = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
   const navigate = useNavigate();
@@ -43,11 +45,11 @@ const ProductList = () => {
         setTotalPages(response.data.totalPages);
         setTotalData(response.data.totalData);
       } else {
-        setError(response.data.message || "Failed to fetch Products");
+        setError(response.data.message || t("failed_fetch_products"));
       }
     } catch (error) {
-      console.error("Error fetching Products:", error);
-      setError("Error fetching Products. Please try again later.");
+      console.error(t("error_fetching_products"), error);
+      setError(t("error_fetching_products_message"));
     } finally {
       setLoading(false);
     }
@@ -85,8 +87,8 @@ const ProductList = () => {
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
-          title: "Success",
-          text: response.data.message || "Product deleted successfully",
+          title: t("success"),
+          text: response.data.message || t("product_deleted_success"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -100,16 +102,16 @@ const ProductList = () => {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error",
-          text: response.data.message || "Failed to delete product",
+          title: t("error"),
+          text: response.data.message || t("failed_delete_product"),
         });
       }
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error(t("error_deleting_product"), error);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "An error occurred while deleting product",
+        title: t("error"),
+        text: t("error_deleting_product_message"),
       });
     } finally {
       setIsSubmitting(false);
@@ -160,8 +162,8 @@ const ProductList = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Products</h4>
-              <h6>Manage your Products</h6>
+              <h4 className="fw-bold">{t("products")}</h4>
+              <h6>{t("manage_products")}</h6>
             </div>
           </div>
         </div>
@@ -186,7 +188,7 @@ const ProductList = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name..."
+                  placeholder={t("search_product_placeholder")}
                   aria-label="Search"
                   value={searchTerm}
                   onChange={(e) => {
@@ -207,7 +209,7 @@ const ProductList = () => {
               onClick={handleAdd}
             >
               <FiPlus style={{ marginRight: "5px" }} />
-              Add Product
+              {t("add_product")}
             </button>
           </div>
           <div className="card-body p-0">
@@ -216,18 +218,18 @@ const ProductList = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Title</th>
-                    <th>Product ID</th>
-                    <th>Type</th>
-                    <th>Frame Type</th>
-                    <th>Frame Shape</th>
-                    <th>Original Price</th>
-                    <th>Selling Price</th>
-                    <th>Quantity</th>
-                    <th>Color</th>
-                    <th>Actions</th>
+                    <th>{t("image")}</th>
+                    <th>{t("name")}</th>
+                    <th>{t("title")}</th>
+                    <th>{t("product_id")}</th>
+                    <th>{t("type")}</th>
+                    <th>{t("frame_type")}</th>
+                    <th>{t("frame_shape")}</th>
+                    <th>{t("original_price")}</th>
+                    <th>{t("selling_price")}</th>
+                    <th>{t("quantity")}</th>
+                    <th>{t("color")}</th>
+                    <th>{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -277,7 +279,7 @@ const ProductList = () => {
                               }}
                             />
                           ) : (
-                            <span>No Image</span>
+                            <span>{t("no_image")}</span>
                           )}
                         </td>
                         <td>{product.name}</td>
@@ -311,7 +313,7 @@ const ProductList = () => {
                                 />
                               ))
                             ) : (
-                              <span>No Color</span>
+                              <span>{t("no_color")}</span>
                             )}
                           </div>
                         </td>
@@ -322,14 +324,14 @@ const ProductList = () => {
                               onClick={() => handleEdit(product._id)}
                             >
                               <FiEdit style={{ marginRight: "5px" }} />
-                              Edit
+                              {t("edit")}
                             </button>
                             <button
                               className="p-2 d-flex align-items-center border rounded text-danger"
                               onClick={() => handleDelete(product)}
                             >
                               <FiTrash2 style={{ marginRight: "5px" }} />
-                              Delete
+                              {t("delete")}
                             </button>
 
                             <button
@@ -337,7 +339,7 @@ const ProductList = () => {
                               onClick={() => handleView(product._id)}
                             >
                               <FiEye style={{ marginRight: "5px" }} />
-                              View
+                              {t("view")}
                             </button>
                           </div>
                         </td>
@@ -346,7 +348,7 @@ const ProductList = () => {
                   ) : (
                     <tr>
                       <td colSpan="12" className="text-center py-4">
-                        No Products found.
+                        {t("no_products_found")}
                       </td>
                     </tr>
                   )}
@@ -357,9 +359,11 @@ const ProductList = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalData)} of {totalData}{" "}
-                entries
+                {t("showing_entries", {
+                  start: (currentPage - 1) * itemsPerPage + 1,
+                  end: Math.min(currentPage * itemsPerPage, totalData),
+                  total: totalData
+                })}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -372,7 +376,7 @@ const ProductList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -414,7 +418,7 @@ const ProductList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>
@@ -429,10 +433,10 @@ const ProductList = () => {
         isOpen={deleteModalIsOpen}
         onRequestClose={() => setDeleteModalIsOpen(false)}
         style={customStyles}
-        contentLabel="Delete Product"
+        contentLabel={t("confirm_delete")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Confirm Delete</h5>
+          <h5 className="modal-title">{t("confirm_delete")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -441,9 +445,8 @@ const ProductList = () => {
         </div>
         <div className="modal-body">
           <p>
-            Are you sure you want to delete the Product{" "}
-            <strong>{currentProduct?.name}</strong>? This action cannot be
-            undone.
+            {t("confirm_delete_message")} <strong>{currentProduct?.name}</strong>?{" "}
+            {t("action_cannot_undone")}
           </p>
         </div>
         <div className="modal-footer">
@@ -453,7 +456,7 @@ const ProductList = () => {
             onClick={() => setDeleteModalIsOpen(false)}
             disabled={isSubmitting}
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
@@ -469,10 +472,10 @@ const ProductList = () => {
                   aria-hidden="true"
                 ></span>
                 <span className="visually-hidden">Loading...</span>
-                Deleting...
+                {t("deleting")}
               </>
             ) : (
-              "Delete"
+              t("delete")
             )}
           </button>
         </div>

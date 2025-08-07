@@ -5,11 +5,13 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEye } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
+import { useTranslation } from "react-i18next";
 
 const Userlist = () => {
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,19 +30,16 @@ const Userlist = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${base_url}getAllUsers`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            params: {
-              page: currentPage,
-              limit: itemsPerPage,
-              search: searchTerm,
-            },
-          }
-        );
+        const response = await axios.get(`${base_url}getAllUsers`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          params: {
+            page: currentPage,
+            limit: itemsPerPage,
+            search: searchTerm,
+          },
+        });
 
         if (response.status === 200) {
           setUsers(response.data.data);
@@ -64,8 +63,6 @@ const Userlist = () => {
 
     return () => clearTimeout(debounceTimer);
   }, [base_url, currentPage, itemsPerPage, searchTerm]);
-
-  
 
   const handleViewUser = (userId) => {
     navigate("/userDetails", { state: { userId } });
@@ -93,8 +90,8 @@ const Userlist = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Users</h4>
-              <h6>Manage your Users</h6>
+              <h4 className="fw-bold">{t("users")}</h4>
+              <h6>{t("manage_your_users")}</h6>
             </div>
           </div>
         </div>
@@ -119,7 +116,7 @@ const Userlist = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name, email, phone..."
+                  placeholder={t("search_placeholder")}
                   aria-label="Search"
                   value={searchTerm}
                   onChange={(e) => {
@@ -142,12 +139,11 @@ const Userlist = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#Id</th>
-                    <th>Users</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Location</th>
-                    
-                    <th className="text-center" >Action</th>
+                    <th>{t("users")}</th>
+                    <th>{t("email")}</th>
+                    <th>{t("phone")}</th>
+                    <th>{t("location")}</th>
+                    <th className="text-center">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -188,7 +184,11 @@ const Userlist = () => {
 
                         <td>
                           <div className="d-flex align-items-center">
-                            <Link to={"/userDetails"} state={{ userId: user._id }} className="avatar avatar-md me-2">
+                            <Link
+                              to={"/userDetails"}
+                              state={{ userId: user._id }}
+                              className="avatar avatar-md me-2"
+                            >
                               {user.profileImage ? (
                                 <img
                                   src={`${file_url}${user.profileImage}`}
@@ -215,8 +215,6 @@ const Userlist = () => {
                                     fontWeight: "bold",
                                     fontSize: "16px",
                                   }}
-                                  
-
                                 >
                                   {user.firstName
                                     ? user.firstName.charAt(0).toUpperCase()
@@ -225,8 +223,12 @@ const Userlist = () => {
                               )}
                             </Link>
                             <div>
-                              <Link to={"/userDetails"} state={{ userId: user._id }} className="fw-bold">
-                                {user.firstName} 
+                              <Link
+                                to={"/userDetails"}
+                                state={{ userId: user._id }}
+                                className="fw-bold"
+                              >
+                                {user.firstName}
                                 {user.lastName}
                               </Link>
                               <div className="text-muted small">
@@ -242,17 +244,15 @@ const Userlist = () => {
                         </td>
                         <td>{user.phone || "N/A"}</td>
                         <td>{user.address || "N/A"}</td>
-                        
-                       
+
                         <td className="d-flex">
                           <div className="edit-delete-action d-flex align-items-center">
-                            
                             <button
                               className="me-2 p-2 d-flex align-items-center border rounded"
                               onClick={() => handleViewUser(user._id)}
                             >
                               <FiEye style={{ marginRight: "5px" }} />
-                              View
+                              {t("view")}
                             </button>
                           </div>
                         </td>
@@ -261,7 +261,7 @@ const Userlist = () => {
                   ) : (
                     <tr>
                       <td colSpan="8" className="text-center py-4">
-                        No premium users found.
+                        {t("no_users_found")}
                       </td>
                     </tr>
                   )}
@@ -272,9 +272,11 @@ const Userlist = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalUsers)} of{" "}
-                {totalUsers} entries
+                {t("showing_entries", {
+                  start: (currentPage - 1) * itemsPerPage + 1,
+                  end: Math.min(currentPage * itemsPerPage, totalUsers),
+                  total: totalUsers,
+                })}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -287,7 +289,7 @@ const Userlist = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -329,7 +331,7 @@ const Userlist = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>

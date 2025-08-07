@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
+import socket from "./socket";
+import { useTranslation } from "react-i18next";
 
 const AppointmentList = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -53,9 +56,25 @@ const AppointmentList = () => {
 
   useEffect(() => {
     fetchData();
-  }, [base_url, currentPage, itemsPerPage, searchTerm]);
+
+    const handleNewAppointment = (newAppointment) => {
+      console.log("📦 New appointment received:", newAppointment);
+      setData((prev) => [newAppointment, ...prev.slice(0, itemsPerPage - 1)]);
+    };
+
+    socket.on("newAppointment", handleNewAppointment);
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    return () => {
+      socket.off("newAppointment", handleNewAppointment);
+    };
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   const handleView = (appointment) => {
+    console.log(appointment);
     setCurrentData(appointment);
     setViewModalIsOpen(true);
   };
@@ -118,7 +137,7 @@ const AppointmentList = () => {
         return "bg-primary";
       case "completed":
         return "bg-success";
-      case "cancelled_by_user":
+
       case "cancelled_by_admin":
         return "bg-danger";
       case "rescheduled":
@@ -169,8 +188,8 @@ const AppointmentList = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Appointments</h4>
-              <h6>Manage all user appointments</h6>
+              <h4 className="fw-bold">{t("appointments")}</h4>
+              <h6>{t("manage_appointments")}</h6>
             </div>
           </div>
         </div>
@@ -195,7 +214,7 @@ const AppointmentList = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name, email or phone..."
+                  placeholder={t("search_appointment_placeholder")}
                   aria-label="Search"
                   value={searchTerm}
                   onChange={(e) => {
@@ -212,13 +231,12 @@ const AppointmentList = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#Id</th>
-                    <th>User Name</th>
-                    <th>User Mobile</th>
-                    <th>User Address</th>
-                    <th>Appointment Date</th>
-                    <th>Appointment Time</th>
-                    <th>Status</th>
-                    <th className="text-center" >Action</th>
+                    <th>{t("user_name")}</th>
+                    <th>{t("user_mobile")}</th>
+                    <th>{t("appointment_date")}</th>
+                    <th>{t("appointment_time")}</th>
+                    <th>{t("status")}</th>
+                    <th className="text-center">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -257,14 +275,20 @@ const AppointmentList = () => {
                       <tr key={index}>
                         <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                         <td>
-                          {appointment.userId?.firstName} {appointment.userId?.lastName}
+                          {appointment.userId?.firstName}{" "}
+                          {appointment.userId?.lastName}
                         </td>
                         <td>{appointment.userId?.phone}</td>
-                        <td>{appointment.userId?.address}</td>
-                        <td>{new Date(appointment.date).toLocaleDateString()}</td>
+                        <td>
+                          {new Date(appointment.date).toLocaleDateString()}
+                        </td>
                         <td>{appointment.time}</td>
                         <td>
-                          <span className={`badge ${getStatusBadgeClass(appointment.status)}`}>
+                          <span
+                            className={`badge ${getStatusBadgeClass(
+                              appointment.status
+                            )}`}
+                          >
                             {getStatusDisplayText(appointment.status)}
                           </span>
                         </td>
@@ -275,14 +299,14 @@ const AppointmentList = () => {
                               onClick={() => handleView(appointment)}
                             >
                               <FiEye style={{ marginRight: "5px" }} />
-                              View
+                              {t("view")}
                             </button>
                             <button
                               className="p-2 d-flex align-items-center border rounded text-warning"
                               onClick={() => handleStatusChange(appointment)}
                             >
                               <FiEdit style={{ marginRight: "5px" }} />
-                              Status
+                              {t("status")}
                             </button>
                           </div>
                         </td>
@@ -291,7 +315,7 @@ const AppointmentList = () => {
                   ) : (
                     <tr>
                       <td colSpan="8" className="text-center py-4">
-                        No appointments found.
+                        {t("no_appointments_found")}
                       </td>
                     </tr>
                   )}
@@ -302,9 +326,11 @@ const AppointmentList = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalData)} of {totalData}{" "}
-                entries
+                {t("showing_entries", {
+                  start: (currentPage - 1) * itemsPerPage + 1,
+                  end: Math.min(currentPage * itemsPerPage, totalData),
+                  total: totalData,
+                })}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -317,7 +343,7 @@ const AppointmentList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -359,7 +385,7 @@ const AppointmentList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>
@@ -374,10 +400,10 @@ const AppointmentList = () => {
         isOpen={viewModalIsOpen}
         onRequestClose={() => setViewModalIsOpen(false)}
         style={viewModalStyles}
-        contentLabel="View Appointment Details"
+        contentLabel={t("appointment_details")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Appointment Details</h5>
+          <h5 className="modal-title">{t("appointment_details")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -389,26 +415,46 @@ const AppointmentList = () => {
             <div className="row">
               <div className="col-md-6">
                 <div className="mb-3">
-                  
                   <hr className="my-2" />
-                  <p><strong>Date:</strong> {new Date(currentData.date).toLocaleDateString()}</p>
-                  <p><strong>Time:</strong> {currentData.time}</p>
-                  <p><strong>Status:</strong> 
-                    <span className={`badge ms-2 ${getStatusBadgeClass(currentData.status)}`}>
+                  <p>
+                    <strong>{t("date")}:</strong>{" "}
+                    {new Date(currentData.date).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>{t("time")}:</strong> {currentData.time}
+                  </p>
+                  <p>
+                    <strong>{t("status")}:</strong>
+                    <span
+                      className={`badge ms-2 ${getStatusBadgeClass(
+                        currentData.status
+                      )}`}
+                    >
                       {getStatusDisplayText(currentData.status)}
                     </span>
                   </p>
-                  <p><strong>Created At:</strong> {new Date(currentData.createdAt).toLocaleString()}</p>
+                  <p>
+                    <strong>{t("created_at")}:</strong>{" "}
+                    {new Date(currentData.createdAt).toLocaleString()}
+                  </p>
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h6>User Information</h6>
+                  <h6>{t("user_information")}</h6>
                   <hr className="my-2" />
-                  <p><strong>Name:</strong> {currentData.userId?.firstName} {currentData.userId?.lastName}</p>
-                  <p><strong>Email:</strong> {currentData.userId?.userEmail}</p>
-                  <p><strong>Phone:</strong> {currentData.userId?.phone}</p>
-                  <p><strong>Address:</strong> {currentData.userId?.address}</p>
+                  <p>
+                    <strong>{t("name")}:</strong>{" "}
+                    {currentData.userId?.firstName}{" "}
+                    {currentData.userId?.lastName}
+                  </p>
+                  <p>
+                    <strong>{t("email")}:</strong>{" "}
+                    {currentData.userId?.userEmail}
+                  </p>
+                  <p>
+                    <strong>{t("phone")}:</strong> {currentData.userId?.phone}
+                  </p>
                 </div>
               </div>
             </div>
@@ -420,7 +466,7 @@ const AppointmentList = () => {
             className="btn btn-secondary"
             onClick={() => setViewModalIsOpen(false)}
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </Modal>
@@ -430,10 +476,10 @@ const AppointmentList = () => {
         isOpen={statusModalIsOpen}
         onRequestClose={() => setStatusModalIsOpen(false)}
         style={viewModalStyles}
-        contentLabel="Update Appointment Status"
+        contentLabel={t("update_appointment_status")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Update Appointment Status</h5>
+          <h5 className="modal-title">{t("update_appointment_status")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -444,34 +490,40 @@ const AppointmentList = () => {
           {currentData && (
             <div>
               <div className="mb-3">
-                <label className="form-label">Current Status:</label>
-                <span className={`badge ms-2 ${getStatusBadgeClass(currentData.status)}`}>
+                <label className="form-label">{t("current_status")}:</label>
+                <span
+                  className={`badge ms-2 ${getStatusBadgeClass(
+                    currentData.status
+                  )}`}
+                >
                   {getStatusDisplayText(currentData.status)}
                 </span>
               </div>
               <div className="mb-3">
-                <label className="form-label">Select New Status:</label>
+                <label className="form-label">{t("select_new_status")}:</label>
                 <select
                   className="form-select"
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
                 >
-                  <option value="booked">Booked</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled_by_admin">Cancelled by Admin</option>
-                  <option value="rescheduled">Rescheduled</option>
+                  <option value="booked">{t("booked")}</option>
+                  <option value="completed">{t("completed")}</option>
+                  <option value="cancelled_by_admin">
+                    {t("cancelled_by_admin")}
+                  </option>
+                  <option value="rescheduled">{t("rescheduled")}</option>
                 </select>
               </div>
             </div>
           )}
         </div>
-        <div className="modal-footer ">
+        <div className="modal-footer">
           <button
             type="button"
             className="btn btn-secondary"
             onClick={() => setStatusModalIsOpen(false)}
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
@@ -479,7 +531,7 @@ const AppointmentList = () => {
             onClick={updateAppointmentStatus}
             style={{ marginLeft: "10px" }}
           >
-            Update Status
+            {t("update_status")}
           </button>
         </div>
       </Modal>

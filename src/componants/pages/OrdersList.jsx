@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
+import { useTranslation } from "react-i18next";
 
 const OrdersList = () => {
   const base_url = import.meta.env.VITE_API_BASE_URL;
@@ -18,6 +19,7 @@ const OrdersList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalData, setTotalData] = useState(0);
   const [itemsPerPage] = useState(10);
+  const { t } = useTranslation();
 
   // Modal states
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
@@ -43,11 +45,11 @@ const OrdersList = () => {
         setTotalPages(response.data.totalPages);
         setTotalData(response.data.totalData);
       } else {
-        setError(response.data.message || "Failed to fetch Products");
+        setError(response.data.message || t("error_fetching_orders"));
       }
     } catch (error) {
-      console.error("Error fetching Products:", error);
-      setError("Error fetching Products. Please try again later.");
+      console.error("Error fetching Orders:", error);
+      setError(t("error_fetching_orders"));
     } finally {
       setLoading(false);
     }
@@ -74,7 +76,7 @@ const OrdersList = () => {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: response.data.message || "Product deleted successfully",
+          text: response.data.message || t("product_deleted_success"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -89,7 +91,7 @@ const OrdersList = () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: response.data.message || "Failed to delete product",
+          text: response.data.message || t("delete_product_error"),
         });
       }
     } catch (error) {
@@ -97,7 +99,7 @@ const OrdersList = () => {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "An error occurred while deleting product",
+        text: t("delete_product_error"),
       });
     } finally {
       setIsSubmitting(false);
@@ -148,8 +150,8 @@ const OrdersList = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Orders</h4>
-              <h6>Manage your Orders</h6>
+              <h4 className="fw-bold">{t("orders")}</h4>
+              <h6>{t("manage_orders")}</h6>
             </div>
           </div>
         </div>
@@ -174,7 +176,7 @@ const OrdersList = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name..."
+                  placeholder={t("search_by_name")}
                   aria-label="Search"
                   value={searchTerm}
                   onChange={(e) => {
@@ -197,20 +199,19 @@ const OrdersList = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#</th>
-                    <th>Order ID</th>
-                    <th>User Name</th>
-                    <th>Product Image</th>
-                    <th>Product Name</th>
-
-                    <th>Product ID</th>
-                    <th>Type</th>
-                    <th>Frame Type</th>
-                    <th>Frame Shape</th>
-                    <th>Original Price</th>
-                    <th>Selling Price</th>
-                    <th>Quantity</th>
-                    <th>Color</th>
-                    <th>Actions</th>
+                    <th>{t("order_id")}</th>
+                    <th>{t("user_name")}</th>
+                    <th>{t("product_image")}</th>
+                    <th>{t("product_name")}</th>
+                    <th>{t("product_id")}</th>
+                    <th>{t("type")}</th>
+                    <th>{t("frame_type")}</th>
+                    <th>{t("frame_shape")}</th>
+                    <th>{t("original_price")}</th>
+                    <th>{t("selling_price")}</th>
+                    <th>{t("quantity")}</th>
+                    <th>{t("color")}</th>
+                    <th>{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -269,11 +270,10 @@ const OrdersList = () => {
                                   }}
                                 />
                               ) : (
-                                <span>No Image</span>
+                                <span>{t("no_image")}</span>
                               )}
                             </td>
                             <td>{product?.name}</td>
-
                             <td>{product?.productId}</td>
                             <td>{product?.productType}</td>
                             <td>{product?.frameType}</td>
@@ -305,7 +305,7 @@ const OrdersList = () => {
                                     )
                                   )
                                 ) : (
-                                  <span>No Color</span>
+                                  <span>{t("no_color")}</span>
                                 )}
                               </div>
                             </td>
@@ -316,7 +316,7 @@ const OrdersList = () => {
                                   onClick={() => handleView(order._id)}
                                 >
                                   <FiEye style={{ marginRight: "5px" }} />
-                                  View
+                                  {t("view")}
                                 </button>
                               </div>
                             </td>
@@ -327,7 +327,7 @@ const OrdersList = () => {
                   ) : (
                     <tr>
                       <td colSpan="14" className="text-center py-4">
-                        No Orders Found.
+                        {t("no_orders_found")}
                       </td>
                     </tr>
                   )}
@@ -338,9 +338,11 @@ const OrdersList = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalData)} of {totalData}{" "}
-                entries
+                {t("showing_entries", {
+                  from: (currentPage - 1) * itemsPerPage + 1,
+                  to: Math.min(currentPage * itemsPerPage, totalData),
+                  total: totalData
+                })}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -353,7 +355,7 @@ const OrdersList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -395,7 +397,7 @@ const OrdersList = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>
@@ -410,10 +412,10 @@ const OrdersList = () => {
         isOpen={deleteModalIsOpen}
         onRequestClose={() => setDeleteModalIsOpen(false)}
         style={customStyles}
-        contentLabel="Delete Product"
+        contentLabel={t("confirm_delete")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Confirm Delete</h5>
+          <h5 className="modal-title">{t("confirm_delete")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -422,9 +424,7 @@ const OrdersList = () => {
         </div>
         <div className="modal-body">
           <p>
-            Are you sure you want to delete the Product{" "}
-            <strong>{currentProduct?.name}</strong>? This action cannot be
-            undone.
+            {t("delete_confirmation", { productName: currentProduct?.name })}
           </p>
         </div>
         <div className="modal-footer">
@@ -434,7 +434,7 @@ const OrdersList = () => {
             onClick={() => setDeleteModalIsOpen(false)}
             disabled={isSubmitting}
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
@@ -450,10 +450,10 @@ const OrdersList = () => {
                   aria-hidden="true"
                 ></span>
                 <span className="visually-hidden">Loading...</span>
-                Deleting...
+                {t("deleting")}
               </>
             ) : (
-              "Delete"
+              t("delete")
             )}
           </button>
         </div>

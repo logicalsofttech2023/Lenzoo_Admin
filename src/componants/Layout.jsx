@@ -35,7 +35,7 @@ const Layout = () => {
         <Outlet />
         <div className="copyright-footer d-flex align-items-center justify-content-between border-top bg-white gap-3 flex-wrap">
           <p className="fs-13 text-gray-9 mb-0">
-            © Logical Softtech. All Right Reserved
+            © Lenzoo+. All Right Reserved
           </p>
         </div>
       </div>

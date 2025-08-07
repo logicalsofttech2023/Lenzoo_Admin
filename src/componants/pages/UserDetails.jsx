@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ColorRing } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const UserDetails = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { userId } = location?.state || {};
@@ -27,13 +29,13 @@ const UserDetails = () => {
       );
 
       if (!response.data?.user) {
-        throw new Error("No user data found");
+        throw new Error(t("noUserDataFound"));
       }
 
       setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user details:", error);
-      toast.error(error.message || "Failed to fetch user details");
+      toast.error(error.message || t("fetchUserDetailsError"));
     } finally {
       setLoading(false);
     }
@@ -55,22 +57,22 @@ const UserDetails = () => {
       );
 
       if (response.data.success) {
-        toast.success("Order status updated successfully");
-        fetchUserDetails(); // Refresh the data
+        toast.success(t("orderStatusUpdated"));
+        fetchUserDetails();
       } else {
         throw new Error(
-          response.data.message || "Failed to update order status"
+          response.data.message || t("updateOrderStatusError")
         );
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error(error.message || "Failed to update order status");
+      toast.error(error.message || t("updateOrderStatusError"));
     }
   };
 
   useEffect(() => {
     if (!userId) {
-      toast.error("No user ID provided");
+      toast.error(t("noUserIdProvided"));
       navigate("/users");
       return;
     }
@@ -78,10 +80,10 @@ const UserDetails = () => {
   }, [userId]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return t("notAvailable");
     const date = new Date(dateString);
     return isNaN(date.getTime())
-      ? "Invalid Date"
+      ? t("invalidDate")
       : date.toLocaleDateString("en-US", {
           year: "numeric",
           month: "short",
@@ -108,15 +110,15 @@ const UserDetails = () => {
   const getOrderStatusBadge = (status) => {
     switch (status) {
       case "placed":
-        return <span className="badge bg-primary">Placed</span>;
+        return <span className="badge bg-primary">{t("placed")}</span>;
       case "processing":
-        return <span className="badge bg-secondary">Processing</span>;
+        return <span className="badge bg-secondary">{t("processing")}</span>;
       case "shipped":
-        return <span className="badge bg-info text-dark">Shipped</span>;
+        return <span className="badge bg-info text-dark">{t("shipped")}</span>;
       case "delivered":
-        return <span className="badge bg-success">Delivered</span>;
+        return <span className="badge bg-success">{t("delivered")}</span>;
       case "cancelled":
-        return <span className="badge bg-danger">Cancelled</span>;
+        return <span className="badge bg-danger">{t("cancelled")}</span>;
       default:
         return <span className="badge bg-secondary">{status}</span>;
     }
@@ -125,13 +127,30 @@ const UserDetails = () => {
   const getPaymentStatusBadge = (status) => {
     switch (status) {
       case "paid":
-        return <span className="badge bg-success">Paid</span>;
+        return <span className="badge bg-success">{t("paid")}</span>;
       case "pending":
-        return <span className="badge bg-warning">Pending</span>;
+        return <span className="badge bg-warning">{t("pending")}</span>;
       case "failed":
-        return <span className="badge bg-danger">Failed</span>;
+        return <span className="badge bg-danger">{t("failed")}</span>;
       case "refunded":
-        return <span className="badge bg-info text-dark">Refunded</span>;
+        return <span className="badge bg-info text-dark">{t("refunded")}</span>;
+      default:
+        return <span className="badge bg-secondary">{status}</span>;
+    }
+  };
+
+  const getAppointmentStatusBadge = (status) => {
+    switch (status) {
+      case "confirmed":
+        return <span className="badge bg-success">{t("confirmed")}</span>;
+      case "pending":
+        return <span className="badge bg-warning">{t("pending")}</span>;
+      case "cancelled_by_user":
+        return <span className="badge bg-danger">{t("cancelledByUser")}</span>;
+      case "cancelled_by_center":
+        return <span className="badge bg-danger">{t("cancelledByCenter")}</span>;
+      case "completed":
+        return <span className="badge bg-info text-dark">{t("completed")}</span>;
       default:
         return <span className="badge bg-secondary">{status}</span>;
     }
@@ -163,7 +182,7 @@ const UserDetails = () => {
         className="d-flex justify-content-center align-items-center"
         style={{ height: "100vh" }}
       >
-        <div className="fs-5 text-danger">No user data found</div>
+        <div className="fs-5 text-danger">{t("noUserDataFound")}</div>
       </div>
     );
   }
@@ -174,14 +193,14 @@ const UserDetails = () => {
         <div className="page-header">
           <div className="add-item d-flex justify-content-between align-items-center w-100">
             <div className="page-title">
-              <h4 className="fw-bold">User Details</h4>
-              <h6 className="text-muted">View and manage user information</h6>
+              <h4 className="fw-bold">{t("userDetails")}</h4>
+              <h6 className="text-muted">{t("manageUserInfo")}</h6>
             </div>
             <button
               onClick={() => navigate(-1)}
               className="btn btn-outline-secondary btn-sm"
             >
-              <i className="ti ti-arrow-left me-1"></i> Back
+              <i className="ti ti-arrow-left me-1"></i> {t("back")}
             </button>
           </div>
         </div>
@@ -205,7 +224,7 @@ const UserDetails = () => {
                         ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
                         : `${file_url}${userData.profileImage}`
                     }
-                    alt="User Profile"
+                    alt={t("userProfile")}
                     className="img-fluid h-100 w-100"
                     style={{ objectFit: "cover" }}
                     onError={() => setImageError(true)}
@@ -227,14 +246,14 @@ const UserDetails = () => {
                   </div>
                   <div className="d-flex align-items-center text-muted">
                     <i className="ti ti-phone me-2"></i>
-                    <span>{userData.phone || "N/A"}</span>
+                    <span>{userData.phone || t("notAvailable")}</span>
                   </div>
                 </div>
 
                 <div className="d-flex flex-wrap gap-3">
                   <div className="d-flex align-items-center text-muted">
                     <i className="ti ti-calendar me-2"></i>
-                    <span>Joined {formatDate(userData.createdAt)}</span>
+                    <span>{t("joined")} {formatDate(userData.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -242,18 +261,20 @@ const UserDetails = () => {
 
             <div className="row">
               <div className="col-lg-12">
-                {/* Orders Section */}
-                {userData.orders?.length > 0 && (
+                {/* Appointments Section */}
+                {userData.appointments?.length > 0 && (
                   <div className="card mb-4 border-0 shadow-sm">
                     <div className="card-header bg-transparent border-0 py-3">
                       <div className="d-flex justify-content-between align-items-center">
                         <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
-                          <i className="ti ti-shopping-cart me-2 text-primary"></i>
-                          Orders
+                          <i className="ti ti-calendar-event me-2 text-primary"></i>
+                          {t("appointments")}
                         </h5>
                         <span className="badge bg-primary">
-                          {userData.orders.length}{" "}
-                          {userData.orders.length === 1 ? "Order" : "Orders"}
+                          {userData.appointments.length}{" "}
+                          {userData.appointments.length === 1
+                            ? t("appointment")
+                            : t("appointments")}
                         </span>
                       </div>
                     </div>
@@ -262,11 +283,59 @@ const UserDetails = () => {
                         <table className="table table-hover">
                           <thead>
                             <tr>
-                              <th>Order ID</th>
-                              <th>Date</th>
-                              <th>Amount</th>
-                              <th>Status</th>
-                              <th>Payment</th>
+                              <th>{t("date")}</th>
+                              <th>{t("timeSlot")}</th>
+                              <th>{t("center")}</th>
+                              <th>{t("status")}</th>
+                              <th>{t("bookedOn")}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {userData.appointments.map((appointment) => (
+                              <tr key={appointment._id}>
+                                <td>{formatDate(appointment.date)}</td>
+                                <td>{appointment.time}</td>
+                                <td>{appointment.centerId?.name || t("notAvailable")}</td>
+                                <td>
+                                  {getAppointmentStatusBadge(
+                                    appointment.status
+                                  )}
+                                </td>
+                                <td>{formatDate(appointment.createdAt)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Orders Section */}
+                {userData.orders?.length > 0 && (
+                  <div className="card mb-4 border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 py-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
+                          <i className="ti ti-shopping-cart me-2 text-primary"></i>
+                          {t("orders")}
+                        </h5>
+                        <span className="badge bg-primary">
+                          {userData.orders.length}{" "}
+                          {userData.orders.length === 1 ? t("order") : t("orders")}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="card-body pt-0">
+                      <div className="table-responsive">
+                        <table className="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>{t("orderId")}</th>
+                              <th>{t("date")}</th>
+                              <th>{t("amount")}</th>
+                              <th>{t("status")}</th>
+                              <th>{t("payment")}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -288,13 +357,13 @@ const UserDetails = () => {
                                       )
                                     }
                                   >
-                                    <option value="placed">Placed</option>
+                                    <option value="placed">{t("placed")}</option>
                                     <option value="processing">
-                                      Processing
+                                      {t("processing")}
                                     </option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
+                                    <option value="shipped">{t("shipped")}</option>
+                                    <option value="delivered">{t("delivered")}</option>
+                                    <option value="cancelled">{t("cancelled")}</option>
                                   </select>
                                 </td>
                                 <td>
@@ -316,13 +385,13 @@ const UserDetails = () => {
                       <div className="d-flex justify-content-between align-items-center">
                         <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
                           <i className="ti ti-file-prescription me-2 text-primary"></i>
-                          Prescriptions
+                          {t("prescriptions")}
                         </h5>
                         <span className="badge bg-primary">
                           {userData.prescriptions.length}{" "}
                           {userData.prescriptions.length === 1
-                            ? "Prescription"
-                            : "Prescriptions"}
+                            ? t("prescription")
+                            : t("prescriptions")}
                         </span>
                       </div>
                     </div>
@@ -343,13 +412,13 @@ const UserDetails = () => {
                                   className="btn btn-sm btn-outline-primary"
                                 >
                                   <i className="ti ti-download me-1"></i>
-                                  Download
+                                  {t("download")}
                                 </a>
                               </div>
                               {prescription.notes && (
                                 <div className="mb-2">
                                   <p className="small text-muted mb-1">
-                                    Notes:
+                                    {t("notes")}:
                                   </p>
                                   <p className="small mb-0">
                                     {prescription.notes}
@@ -371,11 +440,11 @@ const UserDetails = () => {
                       <div className="d-flex justify-content-between align-items-center">
                         <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
                           <i className="ti ti-heart me-2 text-primary"></i>
-                          Favorites
+                          {t("favorites")}
                         </h5>
                         <span className="badge bg-primary">
                           {userData.favorites.length}{" "}
-                          {userData.favorites.length === 1 ? "Item" : "Items"}
+                          {userData.favorites.length === 1 ? t("item") : t("items")}
                         </span>
                       </div>
                     </div>
@@ -425,6 +494,183 @@ const UserDetails = () => {
                                   <span className="badge bg-light text-dark small">
                                     {favorite.productId.frameType}
                                   </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Eye Tests Section */}
+                {userData.eyeTests?.length > 0 && (
+                  <div className="card mb-4 border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 py-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="card-title mb-0 fw-bold d-flex align-items-center">
+                          <i className="ti ti-eye me-2 text-primary"></i>
+                          {t("eyeTests")}
+                        </h5>
+                        <span className="badge bg-primary">
+                          {userData.eyeTests.length}{" "}
+                          {userData.eyeTests.length === 1 ? t("test") : t("tests")}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="card-body pt-0">
+                      <div className="row g-3">
+                        {userData.eyeTests.map((test) => (
+                          <div key={test._id} className="col-md-12">
+                            <div className="border rounded p-3">
+                              <div className="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                  <h6 className="mb-1 fw-bold">
+                                    {t("testDate")}: {formatDate(test.createdAt)}
+                                  </h6>
+                                  <div className="d-flex gap-2">
+                                    <span
+                                      className={`badge ${
+                                        test.condition === "normal"
+                                          ? "bg-success"
+                                          : "bg-warning"
+                                      }`}
+                                    >
+                                      {test.condition === "normal"
+                                        ? t("normal")
+                                        : t("needsAttention")}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="mb-3">
+                                <h6 className="fw-bold mb-2">
+                                  {t("recommendation")}:
+                                </h6>
+                                <p className="mb-0">{test.recommendation}</p>
+                              </div>
+
+                              <div className="row">
+                                <div className="col-md-6">
+                                  <h6 className="fw-bold text-center mb-3">
+                                    {t("leftEye")}
+                                  </h6>
+                                  <div className="table-responsive">
+                                    <table className="table table-bordered">
+                                      <thead className="table-light">
+                                        <tr>
+                                          <th>{t("test")}</th>
+                                          <th>{t("score")}</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td>{t("tumblingE")}</td>
+                                          <td>
+                                            {(
+                                              test.features
+                                                .tumbling_e_left_score * 100
+                                            ).toFixed(1)}
+                                            %
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("visualAcuity")}</td>
+                                          <td>
+                                            {test.features.visual_acuity_left.toFixed(
+                                              1
+                                            )}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("contrast")}</td>
+                                          <td>
+                                            {test.features.contrast_left}%
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("colorVision")}</td>
+                                          <td>
+                                            {(
+                                              test.features.color_vision_left *
+                                              100
+                                            ).toFixed(1)}
+                                            %
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("astigmatism")}</td>
+                                          <td>
+                                            {test.features.astigmatism_left
+                                              ? t("yes")
+                                              : t("no")}
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+
+                                <div className="col-md-6">
+                                  <h6 className="fw-bold text-center mb-3">
+                                    {t("rightEye")}
+                                  </h6>
+                                  <div className="table-responsive">
+                                    <table className="table table-bordered">
+                                      <thead className="table-light">
+                                        <tr>
+                                          <th>{t("test")}</th>
+                                          <th>{t("score")}</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr>
+                                          <td>{t("tumblingE")}</td>
+                                          <td>
+                                            {(
+                                              test.features
+                                                .tumbling_e_right_score * 100
+                                            ).toFixed(1)}
+                                            %
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("visualAcuity")}</td>
+                                          <td>
+                                            {test.features.visual_acuity_right.toFixed(
+                                              1
+                                            )}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("contrast")}</td>
+                                          <td>
+                                            {test.features.contrast_right}%
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("colorVision")}</td>
+                                          <td>
+                                            {(
+                                              test.features.color_vision_right *
+                                              100
+                                            ).toFixed(1)}
+                                            %
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>{t("astigmatism")}</td>
+                                          <td>
+                                            {test.features.astigmatism_right
+                                              ? t("yes")
+                                              : t("no")}
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
                                 </div>
                               </div>
                             </div>

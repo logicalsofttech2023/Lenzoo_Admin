@@ -22,6 +22,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaPencilRuler } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const ProductDetail = () => {
   const base_url = import.meta.env.VITE_API_BASE_URL;
@@ -32,6 +33,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [product, setProduct] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { t } = useTranslation();
 
   // Get product ID from navigation state
   const productId = location.state?.id;
@@ -54,11 +56,11 @@ const ProductDetail = () => {
         if (response.data.success) {
           setProduct(response.data.product);
         } else {
-          setError(response.data.message || "Failed to fetch product details");
+          setError(response.data.message || t("error_fetching"));
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
-        setError("Error fetching product details. Please try again later.");
+        setError(t("error_fetching"));
       } finally {
         setLoading(false);
       }
@@ -70,7 +72,7 @@ const ProductDetail = () => {
       setError("No product ID provided");
       setLoading(false);
     }
-  }, [base_url, productId]);
+  }, [base_url, productId, t]);
 
   // Image slider settings
   const sliderSettings = {
@@ -124,7 +126,7 @@ const ProductDetail = () => {
     return (
       <div className="admin-container">
         <div className="content">
-          <div className="alert alert-info mt-3">No product data available</div>
+          <div className="alert alert-info mt-3">{t("no_product_data")}</div>
         </div>
       </div>
     );
@@ -137,15 +139,15 @@ const ProductDetail = () => {
         <div className="page-header">
           <div className="header-content" style={{ width: "100%" }}>
             <div className="header-title">
-              <h2>Product Details</h2>
-              <p className="text-muted">View and manage product information</p>
+              <h2>{t("product_details")}</h2>
+              <p className="text-muted">{t("view_manage_product")}</p>
             </div>
             <div className="header-actions">
               <button className="btn btn-outline-secondary me-2" onClick={handleBack}>
-                <FiArrowLeftCircle className="me-2" /> Back to Products
+                <FiArrowLeftCircle className="me-2" /> {t("back_to_products")}
               </button>
               <button className="btn btn-primary" onClick={handleEdit}>
-                <FiEdit2 className="me-2" /> Edit Product
+                <FiEdit2 className="me-2" /> {t("edit_product")}
               </button>
             </div>
           </div>
@@ -154,8 +156,6 @@ const ProductDetail = () => {
         {/* Product Content */}
         <div className="product-detail-container">
           <div className="row">
-            
-
             {/* Product Info */}
             <div className="col-lg-12">
               <div className="product-info">
@@ -184,78 +184,76 @@ const ProductDetail = () => {
                 <div className="product-meta">
                   <div className="meta-item">
                     <FiHash className="meta-icon" />
-                    <span>Product ID: {product.productId}</span>
+                    <span>{t("product_id")}: {product.productId}</span>
                   </div>
                   <div className="meta-item">
                     <FiBox className="meta-icon" />
-                    <span>Type: {product.productType}</span>
+                    <span>{t("type")}: {product.productType}</span>
                   </div>
                   <div className="meta-item">
                     <FiLayers className="meta-icon" />
-                    <span>Frame: {product.frameType}</span>
+                    <span>{t("frame")}: {product.frameType}</span>
                   </div>
                   <div className="meta-item">
                     <FiTag className="meta-icon" />
-                    <span>Shape: {product.frameShape}</span>
+                    <span>{t("shape")}: {product.frameShape}</span>
                   </div>
                 </div>
 
                 <div className="specifications">
-                  <h5 className="section-title">Specifications</h5>
+                  <h5 className="section-title">{t("specifications")}</h5>
                   <div className="specs-grid">
                     <div className="spec-item">
                       <div className="spec-label">
-                        <FiSquare  className="me-2" />
-                        Frame Size
+                        <FiSquare className="me-2" />
+                        {t("frame_size")}
                       </div>
                       <div className="spec-value">{product.frameSize}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
                         <FiUsers className="me-2" />
-                        Suitable For
+                        {t("suitable_for")}
                       </div>
                       <div className="spec-value">{product.suitableFor.join(", ")}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
-                        <FiSquare  className="me-2" />
-                        Frame Width
+                        <FiSquare className="me-2" />
+                        {t("frame_width")}
                       </div>
                       <div className="spec-value">{product.frameWidth}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
                         <FiInfo className="me-2" />
-                        Frame Dimensions
+                        {t("frame_dimensions")}
                       </div>
                       <div className="spec-value">{product.frameDimensions}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
                         <FiDroplet className="me-2" />
-                        Frame Color
+                        {t("frame_color")}
                       </div>
                       <div className="spec-value">{product.frameColor}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
                         <FiFeather className="me-2" />
-                        Weight
+                        {t("weight")}
                       </div>
                       <div className="spec-value">{product.weight}</div>
                     </div>
                     <div className="spec-item">
                       <div className="spec-label">
                         <FiBox className="me-2" />
-                        Material
+                        {t("material")}
                       </div>
                       <div className="spec-value">{product.material}</div>
                     </div>
                   </div>
                 </div>
-
-                
               </div>
             </div>
 
@@ -295,7 +293,7 @@ const ProductDetail = () => {
                 <div className="product-footer">
                   <div className="created-date">
                     <small className="text-muted">
-                      Created: {new Date(product.createdAt).toLocaleDateString('en-IN', {
+                      {t("created")}: {new Date(product.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric'
@@ -304,7 +302,7 @@ const ProductDetail = () => {
                   </div>
                   <div className="updated-date">
                     <small className="text-muted">
-                      Last Updated: {new Date(product.updatedAt).toLocaleDateString('en-IN', {
+                      {t("last_updated")}: {new Date(product.updatedAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric'
@@ -313,8 +311,6 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
-
-              
             </div>
           </div>
         </div>

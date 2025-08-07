@@ -3,10 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import feather from "feather-icons";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const { t } = useTranslation();
 
   const toggleSubmenu = (menuName) => {
     setOpenSubmenu((prev) => (prev === menuName ? "" : menuName));
@@ -177,134 +179,132 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
             <div id="sidebar-menu" className="sidebar-menu">
               <ul>
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Main</h6>
+                  <h6 className="submenu-hdr">{t("main")}</h6>
                   <ul>
                     <li className={isActive("/") ? "active" : ""}>
                       <Link to="/">
                         <i className="ti ti-layout-grid fs-16 me-2" />
-                        <span>Dashboard</span>
+                        <span>{t("dashboard")}</span>
                       </Link>
                     </li>
                   </ul>
                 </li>
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">User Mangement </h6>
+                  <h6 className="submenu-hdr">{t("user_management")}</h6>
                   <ul>
                     <li className={isActive("/userlist") ? "active" : ""}>
                       <Link to="/userlist">
                         <i data-feather="box" />
-                        <span>Userlist</span>
+                        <span>{t("userlist")}</span>
                       </Link>
                     </li>
-
                     <li className={isActive("/prescription") ? "active" : ""}>
                       <Link to="/prescription">
                         <i data-feather="box" />
-                        <span>Prescription</span>
+                        <span>{t("prescription")}</span>
                       </Link>
                     </li>
                   </ul>
                 </li>
-
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Appointment Management</h6>
+                  <h6 className="submenu-hdr">{t("center_management")}</h6>
+                  <ul>
+                    <li className={isActive("/centerList") ? "active" : ""}>
+                      <Link to="/centerList">
+                        <i data-feather="box" />
+                        <span>{t("center")}</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+                <li className="submenu-open">
+                  <h6 className="submenu-hdr">{t("appointment_management")}</h6>
                   <ul>
                     <li
-                      className={
-                        isActive("/appointmentList") ? "active" : ""
-                      }
+                      className={isActive("/appointmentList") ? "active" : ""}
                     >
                       <Link to="/appointmentList">
                         <i data-feather="box" />
-                        <span>Appointments List</span>
+                        <span>{t("appointments_list")}</span>
                       </Link>
                     </li>
-
-                    
                   </ul>
                 </li>
 
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Product Management</h6>
+                  <h6 className="submenu-hdr">{t("coupon_management")}</h6>
                   <ul>
-                    <li
-                      className={
-                        isActive("/productList") ? "active" : ""
-                      }
-                    >
+                    <li className={isActive("/couponList") ? "active" : ""}>
+                      <Link to="/couponList">
+                        <i data-feather="box" />
+                        <span>{t("coupons_list")}</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+
+                <li className="submenu-open">
+                  <h6 className="submenu-hdr">{t("product_management")}</h6>
+                  <ul>
+                    <li className={isActive("/productList") ? "active" : ""}>
                       <Link to="/productList">
                         <i data-feather="box" />
-                        <span>Product List</span>
+                        <span>{t("product_list")}</span>
                       </Link>
                     </li>
-
-                    
                   </ul>
                 </li>
 
+
+
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Order Management</h6>
+                  <h6 className="submenu-hdr">{t("order_management")}</h6>
                   <ul>
-                    <li
-                      className={
-                        isActive("/ordersList") ? "active" : ""
-                      }
-                    >
+                    <li className={isActive("/ordersList") ? "active" : ""}>
                       <Link to="/ordersList">
                         <i data-feather="box" />
-                        <span>Orders List</span>
+                        <span>{t("orders_list")}</span>
                       </Link>
                     </li>
-
-                    
                   </ul>
                 </li>
-
-                
-
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Membership Management</h6>
+                  <h6 className="submenu-hdr">{t("membership_management")}</h6>
                   <ul>
                     <li className={isActive("/membership") ? "active" : ""}>
                       <Link to="/membership">
                         <i data-feather="box" />
-                        <span>Membership</span>
+                        <span>{t("membership")}</span>
                       </Link>
                     </li>
-                    
                   </ul>
                 </li>
-
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">All Transaction</h6>
+                  <h6 className="submenu-hdr">{t("all_transaction")}</h6>
                   <ul>
                     <li className={isActive("/transactions") ? "active" : ""}>
                       <Link to="/transactions">
                         <i data-feather="box" />
-                        <span>Transactions</span>
+                        <span>{t("transactions")}</span>
                       </Link>
                     </li>
-                    
                   </ul>
                 </li>
-
                 <li className="submenu-open">
-                  <h6 className="submenu-hdr">Settings</h6>
+                  <h6 className="submenu-hdr">{t("settings")}</h6>
                   <ul>
-                    
                     <li className={isActive("/aboutUs") ? "active" : ""}>
                       <Link to="/aboutUs">
                         <i className="ti ti-settings fs-16 me-2" />
-                        <span>About Us</span>
+                        <span>{t("about_us")}</span>
                       </Link>
                     </li>
                     <li className={isActive("/privacyPolicy") ? "active" : ""}>
                       <Link to="/privacyPolicy">
                         <i className="ti ti-settings fs-16 me-2" />
-                        <span>Privacy Policy</span>
+                        <span>{t("privacy_policy")}</span>
                       </Link>
                     </li>
-
                     <li
                       className={
                         isActive("/termsAndConditions") ? "active" : ""
@@ -312,14 +312,13 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                     >
                       <Link to="/termsAndConditions">
                         <i className="ti ti-settings fs-16 me-2" />
-                        <span>Terms and Conditions</span>
+                        <span>{t("terms_and_conditions")}</span>
                       </Link>
                     </li>
-
                     <li className={isActive("/faq") ? "active" : ""}>
                       <Link to="/faq">
                         <i className="ti ti-settings fs-16 me-2" />
-                        <span>Faq</span>
+                        <span>{t("faq")}</span>
                       </Link>
                     </li>
                   </ul>

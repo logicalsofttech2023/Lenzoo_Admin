@@ -5,8 +5,10 @@ import Swal from "sweetalert2";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
+import { useTranslation } from "react-i18next";
 
 const Transactions = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -39,11 +41,11 @@ const Transactions = () => {
         setTotalPages(response.data.totalPages);
         setTotalData(response.data.totalTransactions);
       } else {
-        setError(response.data.message || "Failed to fetch transactions");
+        setError(response.data.message || t("failedToFetchTransactions"));
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
-      setError("Error fetching transactions. Please try again later.");
+      setError(t("errorFetchingTransactions"));
     } finally {
       setLoading(false);
     }
@@ -53,14 +55,10 @@ const Transactions = () => {
     fetchData();
   }, [base_url, currentPage, itemsPerPage, searchTerm]);
 
-  
-
   const handleView = (transaction) => {
     setCurrentTransaction(transaction);
     setViewModalIsOpen(true);
   };
-
-  
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -102,8 +100,8 @@ const Transactions = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Transactions</h4>
-              <h6>Manage all user transactions</h6>
+              <h4 className="fw-bold">{t("transactions")}</h4>
+              <h6>{t("manageAllUserTransactions")}</h6>
             </div>
           </div>
         </div>
@@ -128,15 +126,14 @@ const Transactions = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name, email or transaction ID..."
-                  aria-label="Search"
+                  placeholder={t("searchPlaceholder")}
+                  aria-label={t("search")}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setCurrentPage(1);
                   }}
                 />
-                
               </form>
             </div>
           </div>
@@ -145,15 +142,15 @@ const Transactions = () => {
               <table className="table datatable">
                 <thead className="thead-light">
                   <tr>
-                    <th>#Id</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Transaction ID</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    <th>{t("id")}</th>
+                    <th>{t("user")}</th>
+                    <th>{t("email")}</th>
+                    <th>{t("amount")}</th>
+                    <th>{t("type")}</th>
+                    <th>{t("status")}</th>
+                    <th>{t("transactionId")}</th>
+                    <th>{t("date")}</th>
+                    <th>{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,13 +193,13 @@ const Transactions = () => {
                         </td>
                         <td>{transaction.userId?.userEmail}</td>
                         <td>₹{transaction.amount?.toLocaleString()}</td>
-                        <td>{transaction.type}</td>
+                        <td>{t(transaction.type)}</td>
                         <td>
                           <span className={`badge ${
                             transaction.status === "success" ? "bg-success" : 
                             transaction.status === "pending" ? "bg-warning" : "bg-danger"
                           }`}>
-                            {transaction.status}
+                            {t(transaction.status)}
                           </span>
                         </td>
                         <td>{transaction.transactionId}</td>
@@ -214,9 +211,8 @@ const Transactions = () => {
                               onClick={() => handleView(transaction)}
                             >
                               <FiEye style={{ marginRight: "5px" }} />
-                              View
+                              {t("view")}
                             </button>
-                            
                           </div>
                         </td>
                       </tr>
@@ -224,7 +220,7 @@ const Transactions = () => {
                   ) : (
                     <tr>
                       <td colSpan="9" className="text-center py-4">
-                        No transactions found.
+                        {t("noTransactionsFound")}
                       </td>
                     </tr>
                   )}
@@ -235,9 +231,9 @@ const Transactions = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalData)} of {totalData}{" "}
-                entries
+                {t("showing")} {(currentPage - 1) * itemsPerPage + 1} {t("to")}{" "}
+                {Math.min(currentPage * itemsPerPage, totalData)} {t("of")} {totalData}{" "}
+                {t("entries")}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -250,7 +246,7 @@ const Transactions = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -292,7 +288,7 @@ const Transactions = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>
@@ -302,17 +298,15 @@ const Transactions = () => {
         </div>
       </div>
 
-      
-
       {/* View Modal */}
       <Modal
         isOpen={viewModalIsOpen}
         onRequestClose={() => setViewModalIsOpen(false)}
         style={viewModalStyles}
-        contentLabel="View Transaction Details"
+        contentLabel={t("viewTransactionDetails")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Transaction Details</h5>
+          <h5 className="modal-title">{t("transactionDetails")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -324,37 +318,37 @@ const Transactions = () => {
             <div className="row">
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h6>Transaction Information</h6>
+                  <h6>{t("transactionInformation")}</h6>
                   <hr className="my-2" />
-                  <p><strong>Transaction ID:</strong> {currentTransaction.transactionId}</p>
-                  <p><strong>Amount:</strong> ₹{currentTransaction.amount?.toLocaleString()}</p>
-                  <p><strong>Type:</strong> {currentTransaction.type}</p>
-                  <p><strong>Status:</strong> 
+                  <p><strong>{t("transactionId")}:</strong> {currentTransaction.transactionId}</p>
+                  <p><strong>{t("amount")}:</strong> ₹{currentTransaction.amount?.toLocaleString()}</p>
+                  <p><strong>{t("type")}:</strong> {t(currentTransaction.type)}</p>
+                  <p><strong>{t("status")}:</strong> 
                     <span className={`badge ms-2 ${
                       currentTransaction.status === "success" ? "bg-success" : 
                       currentTransaction.status === "pending" ? "bg-warning" : "bg-danger"
                     }`}>
-                      {currentTransaction.status}
+                      {t(currentTransaction.status)}
                     </span>
                   </p>
-                  <p><strong>Date:</strong> {new Date(currentTransaction.createdAt).toLocaleString()}</p>
-                  <p><strong>Description:</strong> {currentTransaction.description}</p>
+                  <p><strong>{t("date")}:</strong> {new Date(currentTransaction.createdAt).toLocaleString()}</p>
+                  <p><strong>{t("description")}:</strong> {currentTransaction.description}</p>
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h6>User Information</h6>
+                  <h6>{t("userInformation")}</h6>
                   <hr className="my-2" />
-                  <p><strong>Name:</strong> {currentTransaction.userId?.firstName} {currentTransaction.userId?.middleName} {currentTransaction.userId?.lastName}</p>
-                  <p><strong>Email:</strong> {currentTransaction.userId?.userEmail}</p>
-                  <p><strong>Phone:</strong> {currentTransaction.userId?.phone}</p>
-                  <p><strong>Address:</strong> {currentTransaction.userId?.address}</p>
-                  <p><strong>User Status:</strong> 
+                  <p><strong>{t("name")}:</strong> {currentTransaction.userId?.firstName} {currentTransaction.userId?.middleName} {currentTransaction.userId?.lastName}</p>
+                  <p><strong>{t("email")}:</strong> {currentTransaction.userId?.userEmail}</p>
+                  <p><strong>{t("phone")}:</strong> {currentTransaction.userId?.phone}</p>
+                  <p><strong>{t("address")}:</strong> {currentTransaction.userId?.address}</p>
+                  <p><strong>{t("userStatus")}:</strong> 
                     <span className={`badge ms-2 ${
                       currentTransaction.userId?.adminVerified === "approved" ? "bg-success" : 
                       currentTransaction.userId?.adminVerified === "pending" ? "bg-warning" : "bg-danger"
                     }`}>
-                      {currentTransaction.userId?.adminVerified}
+                      {t(currentTransaction.userId?.adminVerified)}
                     </span>
                   </p>
                 </div>
@@ -368,7 +362,7 @@ const Transactions = () => {
             className="btn btn-secondary"
             onClick={() => setViewModalIsOpen(false)}
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </Modal>

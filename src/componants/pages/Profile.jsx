@@ -15,10 +15,11 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
+
 const Profile = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("profile");
   const [userData, setUserData] = useState({});
   const [passwordData, setPasswordData] = useState({
@@ -30,7 +31,6 @@ const Profile = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
 
   useEffect(() => {
     FeatchProfile();
@@ -82,19 +82,19 @@ const Profile = () => {
         }
       );
 
-      toast.success("Profile updated successfully!");
+      toast.success(t("profileUpdateSuccess"));
       setIsEditing(false);
 
-      // Update the image preview with the new image URL if available in response
       if (response.data?.image) {
         setUserData((prev) => ({ ...prev, image: response.data.image }));
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      toast.error(error.response?.data?.message || t("profileUpdateError"));
     } finally {
       setIsLoading(false);
     }
   };
+
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     const data = {
@@ -110,19 +110,20 @@ const Profile = () => {
         },
       })
       .then(() => {
-        toast.success("Password changed successfully!");
+        toast.success(t("passwordChangeSuccess"));
         setPasswordData({
           newPassword: "",
           confirmPassword: "",
         });
       })
       .catch((error) => {
-        toast.error(error.response?.data?.message || "Error changing password");
+        toast.error(error.response?.data?.message || t("passwordChangeError"));
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
   return (
     <div className="container-fluid py-4 bg-light">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -142,7 +143,7 @@ const Profile = () => {
                     onClick={() => setActiveTab("profile")}
                   >
                     <FontAwesomeIcon icon={faUser} className="me-2" />
-                    Profile
+                    {t("profile")}
                   </button>
                 </li>
                 <li className="nav-item">
@@ -153,7 +154,7 @@ const Profile = () => {
                     onClick={() => setActiveTab("password")}
                   >
                     <FontAwesomeIcon icon={faKey} className="me-2" />
-                    Password
+                    {t("password")}
                   </button>
                 </li>
               </ul>
@@ -163,7 +164,7 @@ const Profile = () => {
                   <div className="row mb-3">
                     <div className="col-md-6 mb-3">
                       <label htmlFor="name" className="form-label">
-                        Name
+                        {t("name")}
                       </label>
                       <input
                         type="text"
@@ -179,7 +180,7 @@ const Profile = () => {
 
                     <div className="col-md-6 mb-3">
                       <label htmlFor="email" className="form-label">
-                        Email
+                        {t("email")}
                       </label>
                       <input
                         type="text"
@@ -202,7 +203,7 @@ const Profile = () => {
                         onClick={() => setIsEditing(true)}
                       >
                         <FontAwesomeIcon icon={faEdit} className="me-2" />
-                        Edit Profile
+                        {t("editProfile")}
                       </button>
                     ) : (
                       <>
@@ -213,7 +214,7 @@ const Profile = () => {
                             setIsEditing(false);
                           }}
                         >
-                          Cancel
+                          {t("cancel")}
                         </button>
                         <button
                           type="submit"
@@ -223,12 +224,12 @@ const Profile = () => {
                           {isLoading ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-2"></span>
-                              Saving...
+                              {t("saving")}...
                             </>
                           ) : (
                             <>
                               <FontAwesomeIcon icon={faSave} className="me-2" />
-                              Save Changes
+                              {t("saveChanges")}
                             </>
                           )}
                         </button>
@@ -242,7 +243,7 @@ const Profile = () => {
                 <form onSubmit={handlePasswordSubmit}>
                   <div className="mb-3">
                     <label htmlFor="newPassword" className="form-label">
-                      New Password
+                      {t("newPassword")}
                     </label>
                     <div className="input-group">
                       <input
@@ -254,7 +255,7 @@ const Profile = () => {
                         name="newPassword"
                         value={passwordData.newPassword}
                         onChange={handlePasswordChange}
-                        placeholder="Enter new password"
+                        placeholder={t("enterNewPassword")}
                       />
                       <button
                         type="button"
@@ -272,7 +273,7 @@ const Profile = () => {
 
                   <div className="mb-3">
                     <label htmlFor="confirmPassword" className="form-label">
-                      Confirm Password
+                      {t("confirmPassword")}
                     </label>
                     <div className="input-group">
                       <input
@@ -284,7 +285,7 @@ const Profile = () => {
                         name="confirmPassword"
                         value={passwordData.confirmPassword}
                         onChange={handlePasswordChange}
-                        placeholder="Enter confirm password"
+                        placeholder={t("enterConfirmPassword")}
                       />
                       <button
                         type="button"
@@ -299,12 +300,12 @@ const Profile = () => {
                   </div>
 
                   <div className="alert alert-info mb-4">
-                    <strong>Password requirements:</strong>
+                    <strong>{t("passwordRequirements")}:</strong>
                     <ul className="mb-0">
-                      <li>Minimum 8 characters</li>
-                      <li>At least one uppercase letter</li>
-                      <li>At least one number</li>
-                      <li>At least one special character</li>
+                      <li>{t("minCharacters")}</li>
+                      <li>{t("oneUppercase")}</li>
+                      <li>{t("oneNumber")}</li>
+                      <li>{t("oneSpecialChar")}</li>
                     </ul>
                   </div>
 
@@ -315,11 +316,11 @@ const Profile = () => {
                       disabled={isLoading}
                     >
                       {isLoading ? (
-                        "Updating..."
+                        t("updating")
                       ) : (
                         <>
                           <FontAwesomeIcon icon={faKey} className="me-2" />
-                          Change Password
+                          {t("changePassword")}
                         </>
                       )}
                     </button>

@@ -4,8 +4,10 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEdit, FiPlus, FiUpload, FiX } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
+import { useTranslation } from "react-i18next";
 
 const EditProduct = () => {
+  const { t } = useTranslation();
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const file_url = import.meta.env.VITE_API_FILE_URL;
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ const EditProduct = () => {
     "Wayfarer",
   ];
   const frameSizes = ["Extra Narrow", "Narrow", "Medium", "Wide", "Extra Wide"];
-  const suitableForOptions = ["Men", "Women", "Kids"];
+  const suitableForOptions = [t("men"), t("women"), t("kids")];
 
   const fetchProductDetails = async (productId) => {
     try {
@@ -127,7 +129,7 @@ const EditProduct = () => {
       Swal.fire({
         icon: "error",
         title: "Too many images",
-        text: "You can upload a maximum of 5 images",
+        text: t("upload_limit_exceeded"),
       });
       return;
     }
@@ -155,21 +157,21 @@ const EditProduct = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Product name is required";
-    if (!formData.title.trim()) newErrors.title = "Product title is required";
+    if (!formData.name.trim()) newErrors.name = t("required_field");
+    if (!formData.title.trim()) newErrors.title = t("required_field");
     if (!formData.originalPrice)
-      newErrors.originalPrice = "Original price is required";
+      newErrors.originalPrice = t("required_field");
     if (!formData.sellingPrice)
-      newErrors.sellingPrice = "Selling price is required";
+      newErrors.sellingPrice = t("required_field");
     if (
       parseFloat(formData.sellingPrice) > parseFloat(formData.originalPrice)
     ) {
-      newErrors.sellingPrice = "Selling price must be less than original price";
+      newErrors.sellingPrice = t("selling_price_error");
     }
     if (formData.suitableFor.length === 0)
-      newErrors.suitableFor = "Please select at least one option";
+      newErrors.suitableFor = t("select_at_least_one");
     if (imageFiles.length === 0)
-      newErrors.images = "Please upload at least one image";
+      newErrors.images = t("upload_at_least_one");
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -224,7 +226,7 @@ const EditProduct = () => {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Product Updated successfully",
+          text: t("product_updated_success"),
 
           showConfirmButton: true,
         }).then(() => {
@@ -233,13 +235,13 @@ const EditProduct = () => {
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      let errorMessage = "Failed to add product";
+      let errorMessage = t("update_product_error");
 
       if (error.response) {
         if (error.response.data && error.response.data.message) {
           errorMessage = error.response.data.message;
         } else if (error.response.status === 400) {
-          errorMessage = "Validation error. Please check your inputs.";
+          errorMessage = t("validation_error");
         }
       }
 
@@ -280,8 +282,8 @@ const EditProduct = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Update Product</h4>
-              <h6>Manage your Products</h6>
+              <h4 className="fw-bold">{t("update_product")}</h4>
+              <h6>{t("manage_products")}</h6>
             </div>
           </div>
         </div>
@@ -294,7 +296,7 @@ const EditProduct = () => {
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Product Name <span className="text-danger">*</span>
+                      {t("product_name")} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -304,7 +306,7 @@ const EditProduct = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Classic Black Eyewear"
+                      placeholder={t("product_name_placeholder")}
                     />
                     {errors.name && (
                       <div className="invalid-feedback">{errors.name}</div>
@@ -313,7 +315,7 @@ const EditProduct = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Product Title <span className="text-danger">*</span>
+                      {t("product_title")} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -323,7 +325,7 @@ const EditProduct = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      placeholder="Stylish Full Rim Round Eyeglasses"
+                      placeholder={t("product_title_placeholder")}
                     />
                     {errors.title && (
                       <div className="invalid-feedback">{errors.title}</div>
@@ -331,13 +333,13 @@ const EditProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">{t("description")}</label>
                     <textarea
                       className="form-control"
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
-                      placeholder="Lightweight and durable eyeglasses perfect for everyday wear."
+                      placeholder={t("description_placeholder")}
                       rows="3"
                     ></textarea>
                   </div>
@@ -346,7 +348,7 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          Original Price (₹){" "}
+                          {t("original_price")}{" "}
                           <span className="text-danger">*</span>
                         </label>
                         <input
@@ -370,7 +372,7 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          Selling Price (₹){" "}
+                          {t("selling_price")}{" "}
                           <span className="text-danger">*</span>
                         </label>
                         <input
@@ -398,7 +400,7 @@ const EditProduct = () => {
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Product Images <span className="text-danger">*</span>
+                      {t("product_images")} <span className="text-danger">*</span>
                     </label>
                     <div
                       className={`image-upload-container ${
@@ -410,7 +412,7 @@ const EditProduct = () => {
                         className="image-upload-label"
                       >
                         <FiUpload className="me-2" />
-                        Upload Images (Max 5)
+                        {t("upload_images")}
                         <input
                           type="file"
                           id="product-images"
@@ -430,7 +432,7 @@ const EditProduct = () => {
                         {imagePreviews.map((preview, index) => (
                           <div key={index} className="image-preview-item">
                             <img
-                              src={`${file_url}${preview}`}
+                              src={typeof preview === 'string' ? `${file_url}${preview}` : preview}
                               alt={`Preview ${index}`}
                             />
                             <button
@@ -448,7 +450,7 @@ const EditProduct = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Product Type <span className="text-danger">*</span>
+                      {t("product_type")} <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
@@ -468,7 +470,7 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          Frame Type <span className="text-danger">*</span>
+                          {t("frame_type")} <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -487,7 +489,7 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          Frame Shape <span className="text-danger">*</span>
+                          {t("frame_shape")} <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -510,7 +512,7 @@ const EditProduct = () => {
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Frame Size <span className="text-danger">*</span>
+                      {t("frame_size")} <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
@@ -528,7 +530,7 @@ const EditProduct = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      Suitable For <span className="text-danger">*</span>
+                      {t("suitable_for")} <span className="text-danger">*</span>
                     </label>
                     <div
                       className={`${errors.suitableFor ? "is-invalid" : ""}`}
@@ -562,7 +564,7 @@ const EditProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">Frame Width</label>
+                    <label className="form-label">{t("frame_width")}</label>
                     <input
                       type="text"
                       className="form-control"
@@ -574,21 +576,21 @@ const EditProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">Quantity Available</label>
+                    <label className="form-label">{t("quantity_available")}</label>
                     <input
                       type="number"
                       className="form-control"
                       name="quantityAvailable"
                       value={formData.quantityAvailable}
                       onChange={handleChange}
-                      placeholder="140 mm"
+                      placeholder="0"
                     />
                   </div>
                 </div>
 
                 <div className="col-md-6">
                   <div className="form-group mb-3">
-                    <label className="form-label">Frame Dimensions</label>
+                    <label className="form-label">{t("frame_dimensions")}</label>
                     <input
                       type="text"
                       className="form-control"
@@ -600,7 +602,7 @@ const EditProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">Frame Colors</label>
+                    <label className="form-label">{t("frame_colors")}</label>
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <input
                         type="color"
@@ -614,7 +616,7 @@ const EditProduct = () => {
                         className="btn btn-sm btn-outline-primary"
                         onClick={addColor}
                       >
-                        Add Color
+                        {t("add_color")}
                       </button>
                     </div>
 
@@ -644,7 +646,7 @@ const EditProduct = () => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="form-group mb-3">
-                        <label className="form-label">Weight</label>
+                        <label className="form-label">{t("weight")}</label>
                         <input
                           type="text"
                           className="form-control"
@@ -657,7 +659,7 @@ const EditProduct = () => {
                     </div>
                     <div className="col-md-6">
                       <div className="form-group mb-3">
-                        <label className="form-label">Material</label>
+                        <label className="form-label">{t("material")}</label>
                         <input
                           type="text"
                           className="form-control"
@@ -672,7 +674,7 @@ const EditProduct = () => {
 
                   <div className="row">
                     <div className="col-md-6">
-                      <label className="form-label">Pupillary Distance</label>
+                      <label className="form-label">{t("pupillary_distance")}</label>
                       <input
                         type="text"
                         className="form-control"
@@ -684,14 +686,14 @@ const EditProduct = () => {
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label">Face Shape</label>
+                      <label className="form-label">{t("face_shape")}</label>
                       <input
                         type="text"
                         className="form-control"
                         name="faceShape"
                         value={formData.faceShape}
                         onChange={handleChange}
-                        placeholder="Round, Oval, Square"
+                        placeholder={t("face_shape_placeholder")}
                       />
                     </div>
                   </div>
@@ -705,7 +707,7 @@ const EditProduct = () => {
                   onClick={() => navigate("/productList")}
                   disabled={loading}
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
@@ -723,10 +725,10 @@ const EditProduct = () => {
                         wrapperClass="color-ring-wrapper me-2"
                         colors={["#fff", "#fff", "#fff", "#fff", "#fff"]}
                       />
-                      Updating...
+                      {t("updating")}
                     </>
                   ) : (
-                    <>Update Product</>
+                    t("update_product")
                   )}
                 </button>
               </div>

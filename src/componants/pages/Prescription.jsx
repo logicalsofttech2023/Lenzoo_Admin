@@ -5,8 +5,11 @@ import Swal from "sweetalert2";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { ColorRing } from "react-loader-spinner";
 import Modal from "react-modal";
+import { useTranslation } from "react-i18next";
 
 const Prescription = () => {
+  const { t } = useTranslation();
+
   const base_url = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -98,8 +101,8 @@ const Prescription = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4 className="fw-bold">Prescriptions</h4>
-              <h6>Manage all user prescriptions</h6>
+              <h4 className="fw-bold">{t("prescriptions")}</h4>
+              <h6>{t("manage_prescriptions")}</h6>
             </div>
           </div>
         </div>
@@ -124,7 +127,7 @@ const Prescription = () => {
                 <input
                   type="text"
                   className="form-control rounded-start-pill"
-                  placeholder="Search by name, email or transaction ID..."
+                  placeholder={t("search_prescription_placeholder")}
                   aria-label="Search"
                   value={searchTerm}
                   onChange={(e) => {
@@ -141,11 +144,11 @@ const Prescription = () => {
                 <thead className="thead-light">
                   <tr>
                     <th>#Id</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Prescription File</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    <th>{t("user")}</th>
+                    <th>{t("email")}</th>
+                    <th>{t("prescription_file")}</th>
+                    <th>{t("date")}</th>
+                    <th>{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -188,19 +191,21 @@ const Prescription = () => {
                           {transaction.userId?.lastName}
                         </td>
                         <td>{transaction.userId?.userEmail}</td>
-
                         <td>
                           <a
-                            href={`${import.meta.env.VITE_API_FILE_URL}${transaction.prescriptionFile}`}
+                            href={`${import.meta.env.VITE_API_FILE_URL}${
+                              transaction.prescriptionFile
+                            }`}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            View
+                            {t("view")}
                           </a>
                         </td>
-
                         <td>
-                          {new Date(transaction.uploadedAt).toLocaleDateString()}
+                          {new Date(
+                            transaction.uploadedAt
+                          ).toLocaleDateString()}
                         </td>
                         <td className="d-flex">
                           <div className="edit-delete-action d-flex align-items-center gap-2">
@@ -209,7 +214,7 @@ const Prescription = () => {
                               onClick={() => handleView(transaction)}
                             >
                               <FiEye style={{ marginRight: "5px" }} />
-                              View
+                              {t("view")}
                             </button>
                           </div>
                         </td>
@@ -218,7 +223,7 @@ const Prescription = () => {
                   ) : (
                     <tr>
                       <td colSpan="9" className="text-center py-4">
-                        No prescriptions found.
+                        {t("no_prescriptions_found")}
                       </td>
                     </tr>
                   )}
@@ -229,9 +234,11 @@ const Prescription = () => {
             {/* Pagination */}
             <div className="pagination-container p-3 d-flex justify-content-between align-items-center">
               <div className="showing-count">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalData)} of {totalData}{" "}
-                entries
+                {t("showing_entries", {
+                  start: (currentPage - 1) * itemsPerPage + 1,
+                  end: Math.min(currentPage * itemsPerPage, totalData),
+                  total: totalData,
+                })}
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -244,7 +251,7 @@ const Prescription = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                   </li>
 
@@ -286,7 +293,7 @@ const Prescription = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </li>
                 </ul>
@@ -301,10 +308,10 @@ const Prescription = () => {
         isOpen={viewModalIsOpen}
         onRequestClose={() => setViewModalIsOpen(false)}
         style={viewModalStyles}
-        contentLabel="View Prescription Details"
+        contentLabel={t("prescription_details")}
       >
         <div className="modal-header">
-          <h5 className="modal-title">Prescription Details</h5>
+          <h5 className="modal-title">{t("prescription_details")}</h5>
           <button
             type="button"
             className="btn-close"
@@ -316,59 +323,51 @@ const Prescription = () => {
             <div className="row">
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h6>Prescription Information</h6>
+                  <h6>{t("prescription_information")}</h6>
                   <hr className="my-2" />
-                  
                   <p>
-                    <strong>Date:</strong>{" "}
+                    <strong>{t("date")}:</strong>{" "}
                     {new Date(currentData.uploadedAt).toLocaleString()}
                   </p>
                   <p>
-                    <strong>Notes:</strong> {currentData.notes}
+                    <strong>{t("notes")}:</strong>{" "}
+                    {currentData.notes || t("na")}
                   </p>
                   <Link>
-                    <strong>View:</strong>{" "}
+                    <strong>{t("view")}:</strong>{" "}
                     <a
-                      href={`${import.meta.env.VITE_API_FILE_URL}${currentData.prescriptionFile}`}
+                      href={`${import.meta.env.VITE_API_FILE_URL}${
+                        currentData.prescriptionFile
+                      }`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      View
+                      {t("view")}
                     </a>
                   </Link>
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h6>User Information</h6>
+                  <h6>{t("user_information")}</h6>
                   <hr className="my-2" />
                   <p>
-                    <strong>Name:</strong> {currentData.userId?.firstName}{" "}
+                    <strong>{t("name")}:</strong>{" "}
+                    {currentData.userId?.firstName}{" "}
                     {currentData.userId?.middleName}{" "}
                     {currentData.userId?.lastName}
                   </p>
                   <p>
-                    <strong>Email:</strong> {currentData.userId?.userEmail}
+                    <strong>{t("email")}:</strong>{" "}
+                    {currentData.userId?.userEmail}
                   </p>
                   <p>
-                    <strong>Phone:</strong> {currentData.userId?.phone}
+                    <strong>{t("phone")}:</strong>{" "}
+                    {currentData.userId?.phone || t("na")}
                   </p>
                   <p>
-                    <strong>Address:</strong> {currentData.userId?.address}
-                  </p>
-                  <p>
-                    <strong>User Status:</strong>
-                    <span
-                      className={`badge ms-2 ${
-                        currentData.userId?.adminVerified === "approved"
-                          ? "bg-success"
-                          : currentData.userId?.adminVerified === "pending"
-                          ? "bg-warning"
-                          : "bg-danger"
-                      }`}
-                    >
-                      {currentData.userId?.adminVerified}
-                    </span>
+                    <strong>{t("address")}:</strong>{" "}
+                    {currentData.userId?.address || t("na")}
                   </p>
                 </div>
               </div>
@@ -381,7 +380,7 @@ const Prescription = () => {
             className="btn btn-secondary"
             onClick={() => setViewModalIsOpen(false)}
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </Modal>
