@@ -13,6 +13,25 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
   const toggleSubmenu = (menuName) => {
     setOpenSubmenu((prev) => (prev === menuName ? "" : menuName));
   };
+
+  const handleMenuItemClick = () => {
+  // Close sidebar in mobile view
+  if (window.innerWidth <= 992) {
+    setIsSidebarActive(false);
+    
+    document.documentElement.classList.remove(
+      'menu-opened'
+    );
+    document.querySelectorAll('.main-wrapper').forEach(wrapper => {
+      wrapper.classList.remove('slide-nav', 'mobile-menu-visible');
+    });
+
+    document.querySelectorAll('.sidebar-overlay').forEach(overlay => {
+      overlay.classList.remove('opened');
+    });
+  }
+};
+
   useEffect(() => {
     if (
       location.pathname === "/pandingCompany" ||
@@ -62,28 +81,18 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
     <>
       <div className="sidebar" id="sidebar">
         <div className={`sidebar-logo`}>
-          <Link to="/" className="logo logo-normal">
+          <Link to="/" className="logo logo-normal" onClick={handleMenuItemClick}>
             <h1 className="h2 logo logo-normal fw-bold">
               Lenzoo<span className="text-danger">+</span>
             </h1>
           </Link>
-          <Link to="/" className="logo logo-white">
+          <Link to="/" className="logo logo-white" onClick={handleMenuItemClick}>
             <img src="assets/img/logo.png" alt="Img" />
           </Link>
-          <Link to="/" className="logo-small">
+          <Link to="/" className="logo-small" onClick={handleMenuItemClick}>
             {/* <img src="assets/img/logo.png" alt="Img" /> */}
           </Link>
-          <a
-            id="toggle_btn"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsSidebarActive((prev) => !prev);
-            }}
-            className={isSidebarActive ? "active" : ""}
-          >
-            <i data-feather="chevrons-left" className="feather-16" />
-          </a>
+          
         </div>
         {/* /Logo */}
         <div className="modern-profile p-3 pb-0">
@@ -104,17 +113,17 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
               role="tablist"
             >
               <li className="nav-item">
-                <Link className="nav-link active border-0" to="#">
+                <Link className="nav-link active border-0" to="#" onClick={handleMenuItemClick}>
                   Menu
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link border-0" to="/chat">
+                <Link className="nav-link border-0" to="/chat" onClick={handleMenuItemClick}>
                   Chats
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link border-0" to="/email">
+                <Link className="nav-link border-0" to="/email" onClick={handleMenuItemClick}>
                   Inbox
                 </Link>
               </li>
@@ -137,12 +146,12 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
           </div>
           <div className="d-flex align-items-center justify-content-between menu-item mb-3">
             <div>
-              <Link to="/" className="btn btn-sm btn-icon bg-light">
+              <Link to="/" className="btn btn-sm btn-icon bg-light" onClick={handleMenuItemClick}>
                 <i className="ti ti-layout-grid-remove" />
               </Link>
             </div>
             <div>
-              <Link to="/chat" className="btn btn-sm btn-icon bg-light">
+              <Link to="/chat" className="btn btn-sm btn-icon bg-light" onClick={handleMenuItemClick}>
                 <i className="ti ti-brand-hipchat" />
               </Link>
             </div>
@@ -150,6 +159,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
               <Link
                 to="/email"
                 className="btn btn-sm btn-icon bg-light position-relative"
+                onClick={handleMenuItemClick}
               >
                 <i className="ti ti-message" />
               </Link>
@@ -158,6 +168,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
               <Link
                 to="/activities"
                 className="btn btn-sm btn-icon bg-light position-relative"
+                onClick={handleMenuItemClick}
               >
                 <i className="ti ti-bell" />
                 <span className="notification-status-dot" />
@@ -167,6 +178,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
               <Link
                 to="/general-settings"
                 className="btn btn-sm btn-icon bg-light"
+                onClick={handleMenuItemClick}
               >
                 <i className="ti ti-settings" />
               </Link>
@@ -182,7 +194,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("main")}</h6>
                   <ul>
                     <li className={isActive("/") ? "active" : ""}>
-                      <Link to="/">
+                      <Link to="/" onClick={handleMenuItemClick}>
                         <i className="ti ti-layout-grid fs-16 me-2" />
                         <span>{t("dashboard")}</span>
                       </Link>
@@ -193,13 +205,13 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("user_management")}</h6>
                   <ul>
                     <li className={isActive("/userlist") ? "active" : ""}>
-                      <Link to="/userlist">
+                      <Link to="/userlist" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("userlist")}</span>
                       </Link>
                     </li>
                     <li className={isActive("/prescription") ? "active" : ""}>
-                      <Link to="/prescription">
+                      <Link to="/prescription" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("prescription")}</span>
                       </Link>
@@ -210,7 +222,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("center_management")}</h6>
                   <ul>
                     <li className={isActive("/centerList") ? "active" : ""}>
-                      <Link to="/centerList">
+                      <Link to="/centerList" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("center")}</span>
                       </Link>
@@ -223,7 +235,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                     <li
                       className={isActive("/appointmentList") ? "active" : ""}
                     >
-                      <Link to="/appointmentList">
+                      <Link to="/appointmentList" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("appointments_list")}</span>
                       </Link>
@@ -235,7 +247,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("coupon_management")}</h6>
                   <ul>
                     <li className={isActive("/couponList") ? "active" : ""}>
-                      <Link to="/couponList">
+                      <Link to="/couponList" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("coupons_list")}</span>
                       </Link>
@@ -247,7 +259,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("product_management")}</h6>
                   <ul>
                     <li className={isActive("/productList") ? "active" : ""}>
-                      <Link to="/productList">
+                      <Link to="/productList" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("product_list")}</span>
                       </Link>
@@ -255,13 +267,11 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   </ul>
                 </li>
 
-
-
                 <li className="submenu-open">
                   <h6 className="submenu-hdr">{t("order_management")}</h6>
                   <ul>
                     <li className={isActive("/ordersList") ? "active" : ""}>
-                      <Link to="/ordersList">
+                      <Link to="/ordersList" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("orders_list")}</span>
                       </Link>
@@ -272,7 +282,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("membership_management")}</h6>
                   <ul>
                     <li className={isActive("/membership") ? "active" : ""}>
-                      <Link to="/membership">
+                      <Link to="/membership" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("membership")}</span>
                       </Link>
@@ -283,7 +293,7 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("all_transaction")}</h6>
                   <ul>
                     <li className={isActive("/transactions") ? "active" : ""}>
-                      <Link to="/transactions">
+                      <Link to="/transactions" onClick={handleMenuItemClick}>
                         <i data-feather="box" />
                         <span>{t("transactions")}</span>
                       </Link>
@@ -294,13 +304,13 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                   <h6 className="submenu-hdr">{t("settings")}</h6>
                   <ul>
                     <li className={isActive("/aboutUs") ? "active" : ""}>
-                      <Link to="/aboutUs">
+                      <Link to="/aboutUs" onClick={handleMenuItemClick}>
                         <i className="ti ti-settings fs-16 me-2" />
                         <span>{t("about_us")}</span>
                       </Link>
                     </li>
                     <li className={isActive("/privacyPolicy") ? "active" : ""}>
-                      <Link to="/privacyPolicy">
+                      <Link to="/privacyPolicy" onClick={handleMenuItemClick}>
                         <i className="ti ti-settings fs-16 me-2" />
                         <span>{t("privacy_policy")}</span>
                       </Link>
@@ -310,13 +320,13 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                         isActive("/termsAndConditions") ? "active" : ""
                       }
                     >
-                      <Link to="/termsAndConditions">
+                      <Link to="/termsAndConditions" onClick={handleMenuItemClick}>
                         <i className="ti ti-settings fs-16 me-2" />
                         <span>{t("terms_and_conditions")}</span>
                       </Link>
                     </li>
                     <li className={isActive("/faq") ? "active" : ""}>
-                      <Link to="/faq">
+                      <Link to="/faq" onClick={handleMenuItemClick}>
                         <i className="ti ti-settings fs-16 me-2" />
                         <span>{t("faq")}</span>
                       </Link>

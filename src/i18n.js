@@ -9,7 +9,8 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: "en",
+    fallbackLng: "pt",
+    lng: "pt",
     resources: {
       en: { translation: en },
       pt: { translation: pt },

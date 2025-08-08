@@ -29,8 +29,9 @@ import OrderDetail from "./componants/pages/OrderDetail";
 import CenterList from "./componants/pages/CenterList";
 import EditCenter from "./componants/pages/EditCenter";
 import CouponList from "./componants/pages/CouponList";
-import AddCoupon from "./componants/pages/AddCoupon"
+import AddCoupon from "./componants/pages/AddCoupon";
 import EditCoupon from "./componants/pages/EditCoupon";
+import ForgotAdminPassword from "./componants/ForgotAdminPassword";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -51,6 +52,11 @@ const App = () => {
             )
           }
         />
+
+        <Route
+    path="/forgotAdminPassword"
+    element={<ForgotAdminPassword />}
+  />
 
         {isAuthenticated ? (
           <Route
@@ -98,12 +104,11 @@ const App = () => {
 
             <Route path="/couponList" element={<CouponList />} />
 
-
             <Route path="/addCoupon" element={<AddCoupon />} />
 
             <Route path="/editCoupon" element={<EditCoupon />} />
 
-
+            
           </Route>
         ) : (
           <Route path="/*" element={<Navigate to="/login" replace />} />

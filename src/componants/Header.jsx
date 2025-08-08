@@ -184,10 +184,10 @@ const Header = () => {
                 >
                   <div className="dropdown-header">
                     <h6 className="text-overflow m-0">
-                      {adminData?.name || "Admin User"}
+                      {adminData?.name || t("default_admin_name")}
                     </h6>
                     <span className="text-muted">
-                      {adminData?.email || "admin@example.com"}
+                      {adminData?.email || t("default_admin_email")}
                     </span>
                   </div>
                   <Link
@@ -195,7 +195,7 @@ const Header = () => {
                     className="dropdown-item"
                     onClick={() => setProfileDropdownOpen(false)}
                   >
-                    <i className="ti ti-user me-2"></i> {t("View Profile")}
+                    <i className="ti ti-user me-2"></i> {t("view_profile")}
                   </Link>
                   <div className="dropdown-divider"></div>
                   <button className="dropdown-item" onClick={handleLogout}>
@@ -214,7 +214,7 @@ const Header = () => {
               >
                 <span className="user-img">
                   <img
-                    src={"assets/img/profiles/avatar-01.jpg"}
+                    src={user}
                     alt="User"
                     width="36"
                     height="36"
@@ -226,17 +226,7 @@ const Header = () => {
               {profileDropdownOpen && (
                 <div
                   className="dropdown-menu profile-dropdown show"
-                  style={{
-                    minWidth: "280px",
-                    position: "absolute",
-                    right: "10px",
-                    top: "100%",
-                    zIndex: 1000,
-                    border: "1px solid rgba(0,0,0,.15)",
-                    borderRadius: "0.25rem",
-                    backgroundColor: "#fff",
-                    boxShadow: "0 0.5rem 1rem rgba(0,0,0,.175)",
-                  }}
+                  
                 >
                   <div className="dropdown-header">
                     <h6 className="text-overflow m-0">
@@ -314,9 +304,9 @@ const Header = () => {
             display: none !important;
           }
           .nav.user-menu .dropdown-menu {
-            width: 280px;
-            right: 10px;
-            left: auto;
+            width: 160px;
+            right: -15px;
+            bottom: -83%;
           }
           .nav.user-menu .user-img img {
             border: 2px solid #fff;

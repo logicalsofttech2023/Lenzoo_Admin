@@ -7,25 +7,29 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState("1y");
-  const [chartData, setChartData] = useState([]);
   const [subscriptionData, setSubscriptionData] = useState({});
   const [appointmentData, setAppointmentData] = useState({});
   const [visionTestData, setVisionTestData] = useState({});
   const [orderTrends, setOrderTrends] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Dummy data remains the same
+  // Dummy data as fallback
   const dummyData = {
     stats: {
+      total_users: 1000,
+      totalPrescriptions: 2000,
       totalProducts: 1234,
       totalOrders: 5678,
       totalSubscriptions: 1245,
       activeSubscriptions: 892,
-      scheduledExams: 156,
+      total_appointments: 156,
       visionTestsCompleted: 783,
       basicPlanRevenue: 125000,
       plusPlanRevenue: 245000,
       premiumPlanRevenue: 380000,
-      measurementAccuracy: 92
+      measurementAccuracy: 92,
+      
     },
     subscriptionData: {
       planDistribution: [420, 350, 475] // Basic, Plus, Premium
@@ -40,22 +44,64 @@ const Dashboard = () => {
       completed: [20, 25, 38, 32, 40, 45, 55, 50, 42, 48, 35, 30]
     },
     visionTestData: {
-      myopia: [120, 85, 45, 20],    // Normal, Mild, Moderate, Severe
+      myopia: [120, 85, 45, 20], 
       hyperopia: [150, 60, 30, 10],
       astigmatism: [180, 75, 40, 15]
     }
   };
 
-  // Fetch all dashboard data (same as before)
+  // Fetch all dashboard data from API
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}getDashboardData`);
+      const apiData = response.data;
+      console.log(apiData.appointmentStatusCounts);
+      
+      
+      // Transform API data to match our component's state structure
+      setStats({
+        total_users: apiData.totalUsers,
+        totalPrescriptions: apiData.totalPrescriptions, // Not in API
+        totalProducts: apiData.totalProducts,
+        totalOrders: apiData.totalOrders,
+        totalSubscriptions: apiData.totalSubscriptions,
+        activeSubscriptions: apiData.activeSubscriptions,
+        total_appointments: apiData.totalAppointments,
+        visionTestsCompleted: apiData.totalEyeTests,
+        basicPlanRevenue: apiData.membershipRevenue.Basic,
+        plusPlanRevenue: apiData.membershipRevenue.Plus,
+        premiumPlanRevenue: apiData.membershipRevenue.Premium,
+        measurementAccuracy: 92,
+        appointmentStatusCounts: apiData.appointmentStatusCounts,
+        orderStatusCounts: apiData.orderStatusCounts
+
+      });
+
+      setSubscriptionData({
+        planDistribution: [
+            20,
+            40,
+            40
+        ]
+      });
+
+      // For data not available in API, use dummy data
+      setOrderTrends(apiData.orderTrends);  
+      setAppointmentData(dummyData.appointmentData);
+      setVisionTestData(dummyData.visionTestData);
+
+    } catch (error) {
+      console.error(t("error_fetching_dashboard"), error);
+      setError(error);
+      // Fallback to dummy data if API fails
       setStats(dummyData.stats);
       setSubscriptionData(dummyData.subscriptionData);
       setAppointmentData(dummyData.appointmentData);
       setVisionTestData(dummyData.visionTestData);
       setOrderTrends(dummyData.orderTrends);
-    } catch (error) {
-      console.error(t("error_fetching_dashboard"), error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -136,16 +182,69 @@ const Dashboard = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="content">
+        <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="content">
+        <div className="alert alert-danger">
+          {t("error_fetching_dashboard")}: {error.message}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="content">
       {/* Main Stats Cards */}
       <div className="row">
+
+        {/* Total Users */}
+        <div className="col-xl-3 col-sm-6 col-12 d-flex">
+          <div className="card bg-info sale-widget flex-fill">
+            <div className="card-body d-flex align-items-center">
+              <span className="sale-icon bg-white text-info">
+                <i className="ti ti-users fs-24" />
+              </span>
+              <div className="ms-2">
+                <p className="text-white mb-1">{t("total_users")}</p>
+                <h4 className="text-white">{stats?.total_users ?? 0}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Prescriptions */}
+        <div className="col-xl-3 col-sm-6 col-12 d-flex">
+          <div className="card bg-success sale-widget flex-fill">
+            <div className="card-body d-flex align-items-center">
+              <span className="sale-icon bg-white text-success">
+                <i className="ti ti-stethoscope fs-24" />
+              </span>
+              <div className="ms-2">
+                <p className="text-white mb-1">{t("total_prescriptions")}</p>
+                <h4 className="text-white">{stats?.totalPrescriptions ?? 0}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Total Products */}
         <div className="col-xl-3 col-sm-6 col-12 d-flex">
           <div className="card bg-primary sale-widget flex-fill">
             <div className="card-body d-flex align-items-center">
               <span className="sale-icon bg-white text-primary">
-                <i className="ti ti-box fs-24" />
+                <i className="ti ti-package fs-24" />
               </span>
               <div className="ms-2">
                 <p className="text-white mb-1">{t("total_products")}</p>
@@ -208,8 +307,8 @@ const Dashboard = () => {
                 <i className="ti ti-calendar fs-24" />
               </span>
               <div className="ms-2">
-                <p className="text-white mb-1">{t("scheduled_exams")}</p>
-                <h4 className="text-white">{stats?.scheduledExams ?? 0}</h4>
+                <p className="text-white mb-1">{t("total_appointments")}</p>
+                <h4 className="text-white">{stats?.total_appointments ?? 0}</h4>
               </div>
             </div>
           </div>
@@ -225,6 +324,51 @@ const Dashboard = () => {
               <div className="ms-2">
                 <p className="text-white mb-1">{t("vision_tests_completed")}</p>
                 <h4 className="text-white">{stats?.visionTestsCompleted ?? 0}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row mt-3">
+        {/* Order Status Overview */}
+        <div className="col-12">
+          <div className="card">
+            <div className="card-header">
+              <h5 className="card-title">{t("appointment_status_overview")}</h5>
+            </div>
+            <div className="card-body">
+              <div className="row text-center">
+                <div className="col-xl-2 col-sm-4 col-6">
+                  <div className="border p-3 br-8 mb-3">
+                    <h6 className="mb-1">{t("booked")}</h6>
+                    <h4 className="text-warning">{stats?.appointmentStatusCounts?.booked ?? 0}</h4>
+                  </div>
+                </div>
+                <div className="col-xl-2 col-sm-4 col-6">
+                  <div className="border p-3 br-8 mb-3">
+                    <h6 className="mb-1">{t("cancelled_by_user")}</h6>
+                    <h4 className="text-info">{stats?.appointmentStatusCounts?.cancelled_by_user ?? 0}</h4>
+                  </div>
+                </div>
+                <div className="col-xl-2 col-sm-4 col-6">
+                  <div className="border p-3 br-8 mb-3">
+                    <h6 className="mb-1">{t("cancelled_by_admin")}</h6>
+                    <h4 className="text-primary">{stats?.appointmentStatusCounts?.cancelled_by_admin ?? 0}</h4>
+                  </div>
+                </div>
+                <div className="col-xl-2 col-sm-4 col-6">
+                  <div className="border p-3 br-8 mb-3">
+                    <h6 className="mb-1">{t("completed")}</h6>
+                    <h4 className="text-success">{stats?.appointmentStatusCounts?.completed ?? 0}</h4>
+                  </div>
+                </div>
+                <div className="col-xl-2 col-sm-4 col-6">
+                  <div className="border p-3 br-8 mb-3">
+                    <h6 className="mb-1">{t("rescheduled")}</h6>
+                    <h4 className="text-danger">{stats?.appointmentStatusCounts?.rescheduled ?? 0}</h4>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -299,38 +443,32 @@ const Dashboard = () => {
               <div className="row text-center">
                 <div className="col-xl-2 col-sm-4 col-6">
                   <div className="border p-3 br-8 mb-3">
-                    <h6 className="mb-1">{t("pending")}</h6>
-                    <h4 className="text-warning">45</h4>
+                    <h6 className="mb-1">{t("placed")}</h6>
+                    <h4 className="text-warning">{stats?.orderStatusCounts?.placed ?? 0}</h4>
                   </div>
                 </div>
                 <div className="col-xl-2 col-sm-4 col-6">
                   <div className="border p-3 br-8 mb-3">
                     <h6 className="mb-1">{t("processing")}</h6>
-                    <h4 className="text-info">28</h4>
+                    <h4 className="text-info">{stats?.orderStatusCounts?.processing ?? 0}</h4>
                   </div>
                 </div>
                 <div className="col-xl-2 col-sm-4 col-6">
                   <div className="border p-3 br-8 mb-3">
                     <h6 className="mb-1">{t("shipped")}</h6>
-                    <h4 className="text-primary">62</h4>
+                    <h4 className="text-primary">{stats?.orderStatusCounts?.shipped ?? 0}</h4>
                   </div>
                 </div>
                 <div className="col-xl-2 col-sm-4 col-6">
                   <div className="border p-3 br-8 mb-3">
                     <h6 className="mb-1">{t("delivered")}</h6>
-                    <h4 className="text-success">876</h4>
-                  </div>
-                </div>
-                <div className="col-xl-2 col-sm-4 col-6">
-                  <div className="border p-3 br-8 mb-3">
-                    <h6 className="mb-1">{t("returned")}</h6>
-                    <h4 className="text-danger">34</h4>
+                    <h4 className="text-success">{stats?.orderStatusCounts?.delivered ?? 0}</h4>
                   </div>
                 </div>
                 <div className="col-xl-2 col-sm-4 col-6">
                   <div className="border p-3 br-8 mb-3">
                     <h6 className="mb-1">{t("cancelled")}</h6>
-                    <h4 className="text-secondary">18</h4>
+                    <h4 className="text-danger">{stats?.orderStatusCounts?.cancelled ?? 0}</h4>
                   </div>
                 </div>
               </div>

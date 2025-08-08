@@ -15031,7 +15031,8 @@ svg.feather {
 @media (max-width: 991.96px) {
   .header .header-left {
     position: absolute;
-    width: 100%;
+    padding-left: 115px;
+    /* width: 100%; */
   }
 }
 @media (max-width: 991.96px) {

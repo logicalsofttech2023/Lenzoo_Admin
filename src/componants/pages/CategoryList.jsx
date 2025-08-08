@@ -10,7 +10,7 @@ const CategoryList = () => {
 
   return (
     <>
-      <div class="main-wrapper">
+      <div>
         <div className="content">
           <div className="page-header">
             <div className="add-item d-flex">
