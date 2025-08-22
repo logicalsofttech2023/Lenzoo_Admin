@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ const Dashboard = () => {
 
       // For data not available in API, use dummy data
       setOrderTrends(apiData.orderTrends);  
-      setAppointmentData(dummyData.appointmentData);
+      setAppointmentData(apiData.appointmentTrends);
       setVisionTestData(dummyData.visionTestData);
 
     } catch (error) {
@@ -206,6 +207,8 @@ const Dashboard = () => {
 
   return (
     <div className="content">
+
+      <Link to={"/faceCapture"} >Face Capture</Link>
       {/* Main Stats Cards */}
       <div className="row">
 
@@ -560,8 +563,17 @@ const Dashboard = () => {
                 series={[
                   {
                     name: t("scheduled"),
-                    data: appointmentData.scheduled || Array(12).fill(0)
+                    data: appointmentData.booked || Array(12).fill(0)
                   },
+                  {
+                    name: t("rescheduled"),
+                    data: appointmentData.rescheduled || Array(12).fill(0)
+                  },
+                  {
+                    name: t("cancelled_by_user"),
+                    data: appointmentData.cancelled_by_user || Array(12).fill(0)
+                  },
+                  
                   {
                     name: t("completed"),
                     data: appointmentData.completed || Array(12).fill(0)

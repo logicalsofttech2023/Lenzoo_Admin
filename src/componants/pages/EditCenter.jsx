@@ -510,7 +510,7 @@ const EditCenter = () => {
                       {t("updating")}
                     </>
                   ) : (
-                    <>{t("update_center_button")}</>
+                    <>{t("updated")}</>
                   )}
                 </button>
               </div>

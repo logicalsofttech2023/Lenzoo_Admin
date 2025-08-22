@@ -109,6 +109,7 @@
   "time_slots": "Horários",
   "add_slot": "Adicionar Horário",
   "time_slot": "Horário",
+  "time_slot_placeholder": "08:00 AM - 09:00 AM",
   "available": "Disponível",
   "unavailable": "Indisponível",
   "actions": "Ações",

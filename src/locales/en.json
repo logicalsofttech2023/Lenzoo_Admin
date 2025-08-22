@@ -127,6 +127,7 @@
   "pin_code_required": "PIN code is required",
   "contact_number_required": "Contact number is required",
   "time_slots_required": "Please add at least one time slot",
+  "time_slot_placeholder": "08:00 AM - 09:00 AM",
   "doctor_required": "Doctor is required",
   "appointments": "Appointments",
   "manage_appointments": "Manage all user appointments",
