@@ -461,8 +461,44 @@
   "logout": "Logout",
   "default_admin_name": "Admin User",
   "default_admin_email": "admin@example.com",
-
-
   "appointment_status_overview": "Appointment Status Overview",
-  "cancelled_by_user": "Cancelled by User"
+  "cancelled_by_user": "Cancelled by User",
+  "upload_glb_file": "Upload GLB File",
+  "upload_glb_file_required": "Please upload a GLB file",
+  "view_existing_glb": "View Existing GLB File",
+  "3d_view": "3D View",
+  "power_management": "Power Management",
+  "powerTypes": "Power Types",
+  "addNewPowerType": "Add New Power Type",
+  "powerTypeAdded": "Power type added successfully",
+  "powerTypeUpdated": "Power type updated successfully",
+  "powerTypeDeleted": "Power type deleted successfully",
+  "noPowerTypesFound": "No power types found",
+  "createPowerType": "Create Power Type",
+  "updatePowerType": "Update Power Type",
+  "lensList": "Lens List",
+
+
+  "noLensesFound": "No lenses found",
+  "addNewLens": "Add New Lens",
+  "selectPowerType": "Select Power Type",
+  "createLens": "Create Lens",
+  "lensAdded": "Lens added successfully",
+  "featureImage": "Feature Image",
+  "features": "Features",
+  "featureText": "Feature Text",
+  "warranty": "Warranty",
+  "powerType": "Power Type",
+  "thumbnail": "Thumbnail",
+  "lenses": "Lenses",
+  "benefit": "Benefit",
+  "addFeature": "Add Feature",
+  "removeFeature": "Remove Feature",
+  "images": "Images",
+  "updateLens": "Update Lens",
+  "lensUpdated": "Lens updated successfully",
+  "lensDeleted": "Lens deleted successfully",
+  "existingImages": "Existing Images",
+  "selectType": "Select Type"
+  
 }

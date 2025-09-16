@@ -24,7 +24,7 @@ const EditProduct = () => {
     productType: "Eyeglasses",
     frameType: "Full Rim",
     frameShape: "Round",
-    frameSize: "Medium",
+    frameSize: [],
     suitableFor: [],
     frameWidth: "",
     frameDimensions: "",
@@ -34,6 +34,7 @@ const EditProduct = () => {
     pupillaryDistance: "",
     faceShape: "",
     quantityAvailable: 0,
+    glbFile: null,
   });
 
   // Error state
@@ -61,7 +62,7 @@ const EditProduct = () => {
     "Hexagonal",
     "Wayfarer",
   ];
-  const frameSizes = ["Extra Narrow", "Narrow", "Medium", "Wide", "Extra Wide"];
+  const frameSizes = ["Small", "Medium", "Large"];
   const suitableForOptions = [t("men"), t("women"), t("kids")];
 
   const fetchProductDetails = async (productId) => {
@@ -75,7 +76,21 @@ const EditProduct = () => {
         },
       });
       if (response.status === 200) {
-        setFormData(response.data.product);
+        const product = response.data.product;
+        setFormData({
+          ...product,
+          frameSize: Array.isArray(product.frameSize)
+            ? product.frameSize.filter((s) => s && s.trim() !== "")
+            : [],
+
+          suitableFor: Array.isArray(product.suitableFor)
+            ? product.suitableFor.filter((s) => s && s.trim() !== "")
+            : [],
+
+          frameColor: Array.isArray(product.frameColor)
+            ? product.frameColor.filter((c) => c && c.trim() !== "")
+            : [],
+        });
         setImagePreviews(response.data.product.images);
         setImageFiles(response.data.product.images);
       }
@@ -91,11 +106,19 @@ const EditProduct = () => {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    // Clear error when user types
+
+    if (name === "frameSize") {
+      setFormData({
+        ...formData,
+        frameSize: [value],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -158,11 +181,11 @@ const EditProduct = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = t("required_field");
+    if (formData.frameSize.length === 0)
+      newErrors.frameSize = t("select_at_least_one");
     if (!formData.title.trim()) newErrors.title = t("required_field");
-    if (!formData.originalPrice)
-      newErrors.originalPrice = t("required_field");
-    if (!formData.sellingPrice)
-      newErrors.sellingPrice = t("required_field");
+    if (!formData.originalPrice) newErrors.originalPrice = t("required_field");
+    if (!formData.sellingPrice) newErrors.sellingPrice = t("required_field");
     if (
       parseFloat(formData.sellingPrice) > parseFloat(formData.originalPrice)
     ) {
@@ -170,11 +193,33 @@ const EditProduct = () => {
     }
     if (formData.suitableFor.length === 0)
       newErrors.suitableFor = t("select_at_least_one");
-    if (imageFiles.length === 0)
-      newErrors.images = t("upload_at_least_one");
+    if (imageFiles.length === 0) newErrors.images = t("upload_at_least_one");
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFrameSizeChange = (e) => {
+    const { value, checked } = e.target;
+    let updatedFrameSizes = [...formData.frameSize];
+
+    if (checked) {
+      updatedFrameSizes.push(value);
+    } else {
+      updatedFrameSizes = updatedFrameSizes.filter((item) => item !== value);
+    }
+
+    setFormData({
+      ...formData,
+      frameSize: updatedFrameSizes,
+    });
+
+    if (errors.frameSize) {
+      setErrors({
+        ...errors,
+        frameSize: null,
+      });
+    }
   };
 
   // Handle form submission
@@ -194,9 +239,12 @@ const EditProduct = () => {
             formDataToSend.append("suitableFor", item)
           );
         } else if (key === "frameColor") {
-          // ✅ Fix: Send frameColor as individual items
           formData.frameColor.forEach((color) =>
             formDataToSend.append("frameColor", color)
+          );
+        } else if (key === "frameSize") {
+          formData.frameSize.forEach((size) =>
+            formDataToSend.append("frameSize", size)
           );
         } else {
           formDataToSend.append(key, formData[key]);
@@ -315,7 +363,8 @@ const EditProduct = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      {t("product_title")} <span className="text-danger">*</span>
+                      {t("product_title")}{" "}
+                      <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -400,7 +449,8 @@ const EditProduct = () => {
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      {t("product_images")} <span className="text-danger">*</span>
+                      {t("product_images")}{" "}
+                      <span className="text-danger">*</span>
                     </label>
                     <div
                       className={`image-upload-container ${
@@ -432,7 +482,11 @@ const EditProduct = () => {
                         {imagePreviews.map((preview, index) => (
                           <div key={index} className="image-preview-item">
                             <img
-                              src={typeof preview === 'string' ? `${file_url}${preview}` : preview}
+                              src={
+                                typeof preview === "string"
+                                  ? `${file_url}${preview}`
+                                  : preview
+                              }
                               alt={`Preview ${index}`}
                             />
                             <button
@@ -470,7 +524,8 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          {t("frame_type")} <span className="text-danger">*</span>
+                          {t("frame_type")}{" "}
+                          <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -489,7 +544,8 @@ const EditProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          {t("frame_shape")} <span className="text-danger">*</span>
+                          {t("frame_shape")}{" "}
+                          <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -514,18 +570,33 @@ const EditProduct = () => {
                     <label className="form-label">
                       {t("frame_size")} <span className="text-danger">*</span>
                     </label>
-                    <select
-                      className="form-select"
-                      name="frameSize"
-                      value={formData.frameSize}
-                      onChange={handleChange}
-                    >
-                      {frameSizes.map((size, index) => (
-                        <option key={index} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
+                    <div className={`${errors.frameSize ? "is-invalid" : ""}`}>
+                      <div className="d-flex flex-wrap gap-3">
+                        {frameSizes.map((size, index) => (
+                          <div key={index} className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={`frameSize-${size}`}
+                              value={size}
+                              checked={formData.frameSize.includes(size)}
+                              onChange={handleFrameSizeChange}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`frameSize-${size}`}
+                            >
+                              {size}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {errors.frameSize && (
+                        <div className="invalid-feedback d-block">
+                          {errors.frameSize}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="form-group mb-3">
@@ -576,7 +647,9 @@ const EditProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">{t("quantity_available")}</label>
+                    <label className="form-label">
+                      {t("quantity_available")}
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -586,11 +659,42 @@ const EditProduct = () => {
                       placeholder="0"
                     />
                   </div>
+
+                  <div className="form-group mb-3">
+                    <label className="form-label">{t("upload_glb_file")}</label>
+
+                    {/* File input */}
+                    <input
+                      type="file"
+                      className="form-control"
+                      accept=".glb"
+                      onChange={(e) =>
+                        setFormData({ ...formData, glbFile: e.target.files[0] })
+                      }
+                    />
+
+                    {/* Show existing GLB if already uploaded */}
+                    {formData.glbFile &&
+                      !(formData.glbFile instanceof File) && (
+                        <div className="mt-2">
+                          <a
+                            href={`${file_url}${formData.glbFile}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline-primary btn-sm"
+                          >
+                            {t("view_existing_glb")}
+                          </a>
+                        </div>
+                      )}
+                  </div>
                 </div>
 
                 <div className="col-md-6">
                   <div className="form-group mb-3">
-                    <label className="form-label">{t("frame_dimensions")}</label>
+                    <label className="form-label">
+                      {t("frame_dimensions")}
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -674,7 +778,9 @@ const EditProduct = () => {
 
                   <div className="row">
                     <div className="col-md-6">
-                      <label className="form-label">{t("pupillary_distance")}</label>
+                      <label className="form-label">
+                        {t("pupillary_distance")}
+                      </label>
                       <input
                         type="text"
                         className="form-control"

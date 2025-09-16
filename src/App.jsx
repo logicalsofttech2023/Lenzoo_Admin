@@ -33,6 +33,8 @@ import AddCoupon from "./componants/pages/AddCoupon";
 import EditCoupon from "./componants/pages/EditCoupon";
 import ForgotAdminPassword from "./componants/ForgotAdminPassword";
 import FaceCapture from "./componants/pages/FaceCapture";
+import PowerType from "./componants/pages/PowerType";
+import LensList from "./componants/pages/LensList";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -108,7 +110,8 @@ const App = () => {
             <Route path="/addCoupon" element={<AddCoupon />} />
 
             <Route path="/editCoupon" element={<EditCoupon />} />
-            <Route path="/faceCapture" element={<FaceCapture />} />
+            <Route path="/powerType" element={<PowerType />} />
+            <Route path="/lensList" element={<LensList />} />
 
           </Route>
         ) : (

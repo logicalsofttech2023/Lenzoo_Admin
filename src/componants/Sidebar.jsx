@@ -256,6 +256,25 @@ const Sidebar = ({ isSidebarActive, setIsSidebarActive }) => {
                 </li>
 
                 <li className="submenu-open">
+                  <h6 className="submenu-hdr">{t("power_management")}</h6>
+                  <ul>
+                    <li className={isActive("/powerType") ? "active" : ""}>
+                      <Link to="/powerType" onClick={handleMenuItemClick}>
+                        <i data-feather="box" />
+                        <span>{t("powerTypes")}</span>
+                      </Link>
+                    </li>
+
+                    <li className={isActive("/lensList") ? "active" : ""}>
+                      <Link to="/lensList" onClick={handleMenuItemClick}>
+                        <i data-feather="box" />
+                        <span>{t("lensList")}</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+
+                <li className="submenu-open">
                   <h6 className="submenu-hdr">{t("product_management")}</h6>
                   <ul>
                     <li className={isActive("/productList") ? "active" : ""}>

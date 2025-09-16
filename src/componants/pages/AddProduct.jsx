@@ -21,7 +21,7 @@ const AddProduct = () => {
     productType: "Eyeglasses",
     frameType: "Full Rim",
     frameShape: "Round",
-    frameSize: "Medium",
+    frameSize: [],
     suitableFor: [],
     frameWidth: "",
     frameDimensions: "",
@@ -31,6 +31,7 @@ const AddProduct = () => {
     pupillaryDistance: "",
     faceShape: "",
     quantityAvailable: 0,
+    glbFile: null,
   });
 
   // Error state
@@ -58,7 +59,7 @@ const AddProduct = () => {
     "Hexagonal",
     "Wayfarer",
   ];
-  const frameSizes = ["Extra Narrow", "Narrow", "Medium", "Wide", "Extra Wide"];
+  const frameSizes = ["Small", "Medium", "Large"];
   const suitableForOptions = ["Men", "Women", "Kids"];
 
   // Handle input change
@@ -126,6 +127,29 @@ const AddProduct = () => {
     setImagePreviews(newImagePreviews);
   };
 
+  const handleFrameSizeChange = (e) => {
+    const { value, checked } = e.target;
+    let updatedFrameSizes = [...formData.frameSize];
+
+    if (checked) {
+      updatedFrameSizes.push(value);
+    } else {
+      updatedFrameSizes = updatedFrameSizes.filter((item) => item !== value);
+    }
+
+    setFormData({
+      ...formData,
+      frameSize: updatedFrameSizes,
+    });
+
+    if (errors.frameSize) {
+      setErrors({
+        ...errors,
+        frameSize: null,
+      });
+    }
+  };
+
   // Validate form
   const validateForm = () => {
     const newErrors = {};
@@ -144,6 +168,12 @@ const AddProduct = () => {
     if (imageFiles.length === 0) newErrors.images = t("upload_at_least_one");
     if (!formData.quantityAvailable) {
       newErrors.quantityAvailable = t("required_field");
+    }
+    if (formData.frameSize.length === 0) {
+      newErrors.frameSize = t("select_at_least_one");
+    }
+    if (!formData.glbFile) {
+      newErrors.glbFile = t("upload_glb_file_required");
     }
 
     setErrors(newErrors);
@@ -167,9 +197,12 @@ const AddProduct = () => {
             formDataToSend.append("suitableFor", item)
           );
         } else if (key === "frameColor") {
-          // ✅ Fix: Send frameColor as individual items
           formData.frameColor.forEach((color) =>
             formDataToSend.append("frameColor", color)
+          );
+        } else if (key === "frameSize") {
+          formData.frameSize.forEach((size) =>
+            formDataToSend.append("frameSize", size)
           );
         } else {
           formDataToSend.append(key, formData[key]);
@@ -180,7 +213,7 @@ const AddProduct = () => {
       imageFiles.forEach((file) => {
         formDataToSend.append("images", file);
       });
-
+      
       const response = await axios.post(
         `${base_url}addProduct`,
         formDataToSend,
@@ -285,7 +318,8 @@ const AddProduct = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      {t("product_title")} <span className="text-danger">*</span>
+                      {t("product_title")}{" "}
+                      <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -370,7 +404,8 @@ const AddProduct = () => {
                 <div className="col-md-6">
                   <div className="form-group mb-3">
                     <label className="form-label">
-                      {t("product_images")} <span className="text-danger">*</span>
+                      {t("product_images")}{" "}
+                      <span className="text-danger">*</span>
                     </label>
                     <div
                       className={`image-upload-container ${
@@ -437,7 +472,8 @@ const AddProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          {t("frame_type")} <span className="text-danger">*</span>
+                          {t("frame_type")}{" "}
+                          <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -456,7 +492,8 @@ const AddProduct = () => {
                     <div className="col-md-6">
                       <div className="form-group mb-3">
                         <label className="form-label">
-                          {t("frame_shape")} <span className="text-danger">*</span>
+                          {t("frame_shape")}{" "}
+                          <span className="text-danger">*</span>
                         </label>
                         <select
                           className="form-select"
@@ -481,18 +518,33 @@ const AddProduct = () => {
                     <label className="form-label">
                       {t("frame_size")} <span className="text-danger">*</span>
                     </label>
-                    <select
-                      className="form-select"
-                      name="frameSize"
-                      value={formData.frameSize}
-                      onChange={handleChange}
-                    >
-                      {frameSizes.map((size, index) => (
-                        <option key={index} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
+                    <div className={`${errors.frameSize ? "is-invalid" : ""}`}>
+                      <div className="d-flex flex-wrap gap-3">
+                        {frameSizes.map((size, index) => (
+                          <div key={index} className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={`frameSize-${size}`}
+                              value={size}
+                              checked={formData.frameSize.includes(size)}
+                              onChange={handleFrameSizeChange}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`frameSize-${size}`}
+                            >
+                              {size}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {errors.frameSize && (
+                        <div className="invalid-feedback d-block">
+                          {errors.frameSize}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="form-group mb-3">
@@ -543,7 +595,9 @@ const AddProduct = () => {
                   </div>
 
                   <div className="form-group mb-3">
-                    <label className="form-label">{t("quantity_available")}</label>
+                    <label className="form-label">
+                      {t("quantity_available")}
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -553,11 +607,25 @@ const AddProduct = () => {
                       placeholder="0"
                     />
                   </div>
+
+                  <div className="form-group mb-3">
+                    <label className="form-label">{t("upload_glb_file")}</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      accept=".glb"
+                      onChange={(e) =>
+                        setFormData({ ...formData, glbFile: e.target.files[0] })
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="col-md-6">
                   <div className="form-group mb-3">
-                    <label className="form-label">{t("frame_dimensions")}</label>
+                    <label className="form-label">
+                      {t("frame_dimensions")}
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -641,7 +709,9 @@ const AddProduct = () => {
 
                   <div className="row">
                     <div className="col-md-6">
-                      <label className="form-label">{t("pupillary_distance")}</label>
+                      <label className="form-label">
+                        {t("pupillary_distance")}
+                      </label>
                       <input
                         type="text"
                         className="form-control"
