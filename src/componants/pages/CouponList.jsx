@@ -272,7 +272,7 @@ const CouponList = () => {
                         <td>
                           {coupon.discountType === "percentage"
                             ? `${coupon.discountValue}%`
-                            : `₹${coupon.discountValue}`}
+                            : `€${coupon.discountValue}`}
                         </td>
                         <td>{formatDate(coupon.expiryDate)}</td>
                         <td>
@@ -486,7 +486,7 @@ const CouponList = () => {
                   <p>
                     {currentViewCoupon.discountType === "percentage"
                       ? `${currentViewCoupon.discountValue}%`
-                      : `₹${currentViewCoupon.discountValue}`}
+                      : `€${currentViewCoupon.discountValue}`}
                   </p>
                 </div>
 

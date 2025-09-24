@@ -16,6 +16,7 @@ const AddCoupon = () => {
   // Form state
   const [formData, setFormData] = useState({
     code: "",
+    description: "",
     discountType: "percentage",
     discountValue: 10,
     expiryDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
@@ -103,6 +104,7 @@ const AddCoupon = () => {
     const newErrors = {};
 
     if (!formData.code.trim()) newErrors.code = t("required_field");
+    if (!formData.description.trim()) newErrors.description = t("required_field");
     if (!formData.discountValue) newErrors.discountValue = t("required_field");
     if (formData.discountType === "percentage" && formData.discountValue > 100) {
       newErrors.discountValue = t("discount_percentage_error");
@@ -217,6 +219,25 @@ const AddCoupon = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
+                      {t("description")} <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors.description ? "is-invalid" : ""
+                      }`}
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder={t("coupon_description_placeholder")}
+                    />
+                    {errors.description && (
+                      <div className="invalid-feedback">{errors.description}</div>
+                    )}
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <label className="form-label">
                       {t("discount_type")} <span className="text-danger">*</span>
                     </label>
                     <select
@@ -247,7 +268,7 @@ const AddCoupon = () => {
                         step={formData.discountType === "percentage" ? "1" : "0.01"}
                       />
                       <span className="input-group-text">
-                        {formData.discountType === "percentage" ? "%" : "₹"}
+                        {formData.discountType === "percentage" ? "%" : "€"}
                       </span>
                       {errors.discountValue && (
                         <div className="invalid-feedback">{errors.discountValue}</div>

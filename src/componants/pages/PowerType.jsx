@@ -440,7 +440,7 @@ const PowerType = () => {
                           src={`${file_url}${powerType.image}`} 
                           alt={powerType.title}
                           className="img-thumbnail"
-                          style={{ maxHeight: '50px' }}
+                          style={{ maxHeight: '70px', maxWidth: '70px' , objectFit: 'cover' }}
                         />
                       )}
                     </td>

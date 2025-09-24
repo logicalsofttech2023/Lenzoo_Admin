@@ -192,7 +192,7 @@ const Transactions = () => {
                           {transaction.userId?.firstName} {transaction.userId?.lastName}
                         </td>
                         <td>{transaction.userId?.userEmail}</td>
-                        <td>₹{transaction.amount?.toLocaleString()}</td>
+                        <td>€{transaction.amount?.toLocaleString()}</td>
                         <td>{t(transaction.type)}</td>
                         <td>
                           <span className={`badge ${
@@ -321,7 +321,7 @@ const Transactions = () => {
                   <h6>{t("transactionInformation")}</h6>
                   <hr className="my-2" />
                   <p><strong>{t("transactionId")}:</strong> {currentTransaction.transactionId}</p>
-                  <p><strong>{t("amount")}:</strong> ₹{currentTransaction.amount?.toLocaleString()}</p>
+                  <p><strong>{t("amount")}:</strong> €{currentTransaction.amount?.toLocaleString()}</p>
                   <p><strong>{t("type")}:</strong> {t(currentTransaction.type)}</p>
                   <p><strong>{t("status")}:</strong> 
                     <span className={`badge ms-2 ${

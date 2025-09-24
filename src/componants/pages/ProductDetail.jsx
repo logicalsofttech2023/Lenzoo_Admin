@@ -175,12 +175,12 @@ const ProductDetail = () => {
 
                 <div className="price-container">
                   <div className="current-price">
-                    ₹{product.sellingPrice.toLocaleString()}
+                    €{product.sellingPrice.toLocaleString()}
                   </div>
                   {product.originalPrice > product.sellingPrice && (
                     <div className="original-price">
                       <span className="text-muted text-decoration-line-through">
-                        ₹{product.originalPrice.toLocaleString()}
+                        €{product.originalPrice.toLocaleString()}
                       </span>
                       <span className="discount-badge">
                         {Math.round(

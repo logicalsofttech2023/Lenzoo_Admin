@@ -386,7 +386,7 @@ const Dashboard = () => {
               <div className="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
                 <div>
                   <h4 className="mb-1">
-                    ₹{stats?.basicPlanRevenue?.toLocaleString() ?? 0}
+                    €{stats?.basicPlanRevenue?.toLocaleString() ?? 0}
                   </h4>
                   <p>{t("basic_plan_revenue")}</p>
                 </div>
@@ -404,7 +404,7 @@ const Dashboard = () => {
               <div className="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
                 <div>
                   <h4 className="mb-1">
-                    ₹{stats?.plusPlanRevenue?.toLocaleString() ?? 0}
+                    €{stats?.plusPlanRevenue?.toLocaleString() ?? 0}
                   </h4>
                   <p>{t("plus_plan_revenue")}</p>
                 </div>
@@ -422,7 +422,7 @@ const Dashboard = () => {
               <div className="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
                 <div>
                   <h4 className="mb-1">
-                    ₹{stats?.premiumPlanRevenue?.toLocaleString() ?? 0}
+                    €{stats?.premiumPlanRevenue?.toLocaleString() ?? 0}
                   </h4>
                   <p>{t("premium_plan_revenue")}</p>
                 </div>

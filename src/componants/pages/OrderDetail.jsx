@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 
 const OrderDetail = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const orderId = location.state.orderId;
@@ -113,7 +113,7 @@ const OrderDetail = () => {
       maximumFractionDigits: 0,
     })
       .format(price)
-      .replace("₹", "₹ ");
+      .replace("€", "€ ");
   };
 
   const getOrderStatusBadge = (status) => {
@@ -202,32 +202,38 @@ const OrderDetail = () => {
             {/* Order Summary */}
             <div className="row mb-4">
               <div className="col-md-7">
-                <div className="card border-0 shadow-sm mb-3">
-                  <div className="card-header bg-transparent border-0">
+                <div className="card border-0 shadow-sm mb-4 p-3">
+                  <div className="card-header bg-transparent border-0 mb-2">
                     <h5 className="fw-bold mb-0">{t("order_information")}</h5>
                   </div>
-                  <div className="card-body">
-                    <div className="row">
+                  <div className="card-body p-3">
+                    <div className="row g-3">
                       <div className="col-6">
                         <p className="text-muted small mb-1">{t("order_id")}</p>
                         <p className="fw-bold">{orderData.orderId}</p>
                       </div>
+
                       <div className="col-6 text-end">
-                        <p className="text-muted small mb-1">{t("order_date")}</p>
+                        <p className="text-muted small mb-1">
+                          {t("order_date")}
+                        </p>
                         <p className="fw-bold">
                           {formatDate(orderData.createdAt)}
                         </p>
                       </div>
-                      <div className="col-6">
-                        <p className="text-muted small mb-1">{t("order_status")}</p>
-                        <div className="d-flex align-items-center gap-2">
+
+                      <div className="col-6 d-flex flex-column gap-2">
+                        <p className="text-muted small mb-1">
+                          {t("order_status")}
+                        </p>
+                        <div className="d-flex align-items-center gap-3">
                           {getOrderStatusBadge(orderData.orderStatus)}
 
                           <select
                             className="form-select form-select-sm w-auto"
                             value={orderData.orderStatus}
                             onChange={(e) => updateOrderStatus(e.target.value)}
-                            disabled={isUpdate} // disable while updating
+                            disabled={isUpdate}
                           >
                             <option value="placed">Placed</option>
                             <option value="processing">Processing</option>
@@ -238,7 +244,7 @@ const OrderDetail = () => {
 
                           {isUpdate && (
                             <div
-                              className="spinner-border spinner-border-sm text-primary"
+                              className="spinner-border spinner-border-sm text-primary ms-2"
                               role="status"
                             >
                               <span className="visually-hidden">
@@ -250,12 +256,17 @@ const OrderDetail = () => {
                       </div>
 
                       <div className="col-6 text-end">
-                        <p className="text-muted small mb-1">{t("payment_status")}</p>
+                        <p className="text-muted small mb-1">
+                          {t("payment_status")}
+                        </p>
                         <p>{getPaymentStatusBadge(orderData.paymentStatus)}</p>
                       </div>
-                      <div className="col-12">
-                        <p className="text-muted small mb-1">{t("total_amount")}</p>
-                        <h4 className="fw-bold text-primary">
+
+                      <div className="col-12 mt-2">
+                        <p className="text-muted small mb-1">
+                          {t("total_amount")}
+                        </p>
+                        <h4 className="fw-bold text-primary mb-0">
                           {formatPrice(orderData.totalAmount)}
                         </h4>
                       </div>
@@ -267,7 +278,29 @@ const OrderDetail = () => {
               <div className="col-md-5">
                 <div className="card border-0 shadow-sm">
                   <div className="card-header bg-transparent border-0">
-                    <h5 className="fw-bold mb-0">{t("shipping_information")}</h5>
+                    <h5 className="fw-bold mb-0">
+                      {t("customer_information")}
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    <div className="mb-2">
+                      <p className="fw-bold mb-0">
+                        {orderData.userId?.firstName}{" "}
+                        {orderData.userId?.lastName}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="row mb-4">
+              <div className="col-md-12">
+                <div className="card border-0 shadow-sm mt-3">
+                  <div className="card-header bg-transparent border-0">
+                    <h5 className="fw-bold mb-0">
+                      {t("shipping_information")}
+                    </h5>
                   </div>
                   <div className="card-body">
                     <div className="mb-2">
@@ -332,7 +365,7 @@ const OrderDetail = () => {
                                   style={{ objectFit: "cover" }}
                                   onError={(e) =>
                                     (e.target.src =
-                                      "/images/product-placeholder.png")
+                                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sBcvn-Xavo2ffSD4WTK6KaHdI9rHySx-Xw&s")
                                   }
                                 />
                               </div>
@@ -392,7 +425,7 @@ const OrderDetail = () => {
                           alt={item.productId.name}
                           className="img-fluid rounded"
                           onError={(e) =>
-                            (e.target.src = "/images/product-placeholder.png")
+                            (e.target.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sBcvn-Xavo2ffSD4WTK6KaHdI9rHySx-Xw&s")
                           }
                         />
                       </div>
@@ -424,20 +457,44 @@ const OrderDetail = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">{t("frame_type")}</p>
+                            <p className="text-muted small mb-1">
+                              {t("frame_type")}
+                            </p>
                             <p>{item.productId.frameType}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">{t("frame_shape")}</p>
+                            <p className="text-muted small mb-1">
+                              {t("frame_shape")}
+                            </p>
                             <p>{item.productId.frameShape}</p>
                           </div>
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">{t("frame_size")}</p>
-                            <p>{item.productId.frameSize}</p>
+                            <p className="text-muted small mb-1">
+                              {t("frame_size")}
+                            </p>
+                            <p>{item.frameSize}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("frame_color")}
+                            </p>
+                            <div className="d-flex align-items-center gap-2">
+                              <span>{item.colorCode}</span>
+                              <div
+                                style={{
+                                  width: "20px",
+                                  height: "20px",
+                                  backgroundColor: item.colorCode,
+                                  border: "1px solid #ddd",
+                                }}
+                              ></div>
+                            </div>
                           </div>
                         </div>
                         <div className="col-md-6">
@@ -458,8 +515,50 @@ const OrderDetail = () => {
                         </div>
                         <div className="col-md-6">
                           <div className="mb-3">
-                            <p className="text-muted small mb-1">{t("face_shape")}</p>
+                            <p className="text-muted small mb-1">
+                              {t("face_shape")}
+                            </p>
                             <p>{item.productId.faceShape}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("frame_width")}
+                            </p>
+                            <p>{item.productId.frameWidth}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("frame_dimensions")}
+                            </p>
+                            <p>{item.productId.frameDimensions}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("weight")}
+                            </p>
+                            <p>{item.productId.weight}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("material")}
+                            </p>
+                            <p>{item.productId.material}</p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">
+                              {t("product_id")}
+                            </p>
+                            <p>{item.productId.productId}</p>
                           </div>
                         </div>
                       </div>
@@ -468,6 +567,233 @@ const OrderDetail = () => {
                 </div>
               </div>
             ))}
+
+            {/* Lens Details */}
+            {orderData.items.map(
+              (item) =>
+                item.lensId && (
+                  <div
+                    key={item._id + "-lens"}
+                    className="card border-0 shadow-sm mb-4"
+                  >
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="fw-bold mb-0">Lens Details</h5>
+                    </div>
+                    <div className="card-body">
+                      <div className="row">
+                        <div className="col-md-4">
+                          <div className="mb-3">
+                            <img
+                              src={`${file_url}${item.lensId.thumbnail}`}
+                              alt={item.lensId.title}
+                              className="img-fluid rounded"
+                              onError={(e) =>
+                                (e.target.src =
+                                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sBcvn-Xavo2ffSD4WTK6KaHdI9rHySx-Xw&s")
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-8">
+                          <h4 className="fw-bold mb-3">{item.lensId.title}</h4>
+                          <div className="row">
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">
+                                  {t("lens_price")}
+                                </p>
+                                <h5 className="text-danger">
+                                  {formatPrice(item.lensId.price)}
+                                </h5>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">
+                                  {t("power_type")}
+                                </p>
+                                <p>{item.powerType?.title}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">
+                                  {t("lens_type")}
+                                </p>
+                                <p>{item.lensId.type}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">
+                                  {t("warranty")}
+                                </p>
+                                <p>{item.lensId.warranty}</p>
+                              </div>
+                            </div>
+                            <div className="col-12">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">
+                                  {t("benefits")}
+                                </p>
+                                <ul className="list-group list-group-flush">
+                                  {item.lensId.benefits?.map(
+                                    (benefit, index) => (
+                                      <li
+                                        key={index}
+                                        className="list-group-item px-0 py-1"
+                                      >
+                                        {benefit}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+            )}
+
+            {/* Power Details */}
+            {orderData.items.map(
+              (item) =>
+                item.power && (
+                  <div
+                    key={item._id + "-power"}
+                    className="card border-0 shadow-sm mb-4"
+                  >
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="fw-bold mb-0">Power Details</h5>
+                    </div>
+                    <div className="card-body">
+                      <div className="row">
+                        <div className="col-md-6">
+                          <h5 className="fw-bold mb-3">Left Eye</h5>
+                          <div className="row">
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">SPH</p>
+                                <p>{item.power.left.SPH}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">CYL</p>
+                                <p>{item.power.left.CYL}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">AXIS</p>
+                                <p>{item.power.left.AXIS}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">AP</p>
+                                <p>{item.power.left.AP}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <h5 className="fw-bold mb-3">Right Eye</h5>
+                          <div className="row">
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">SPH</p>
+                                <p>{item.power.right.SPH}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">CYL</p>
+                                <p>{item.power.right.CYL}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">AXIS</p>
+                                <p>{item.power.right.AXIS}</p>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="mb-3">
+                                <p className="text-muted small mb-1">AP</p>
+                                <p>{item.power.right.AP}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+            )}
+
+            {/* Pupillary Distance */}
+            {orderData.items.map(
+              (item) =>
+                item.pupillaryDistance && (
+                  <div
+                    key={item._id + "-pd"}
+                    className="card border-0 shadow-sm mb-4"
+                  >
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="fw-bold mb-0">Pupillary Distance</h5>
+                    </div>
+                    <div className="card-body">
+                      <div className="row">
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">Left Eye</p>
+                            <p className="fw-bold">
+                              {item.pupillaryDistance.left} mm
+                            </p>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <p className="text-muted small mb-1">Right Eye</p>
+                            <p className="fw-bold">
+                              {item.pupillaryDistance.right} mm
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+            )}
+
+            {/* Prescription File */}
+            {orderData.items.map(
+              (item) =>
+                item.prescriptionFile && (
+                  <div
+                    key={item._id + "-prescription"}
+                    className="card border-0 shadow-sm mb-4"
+                  >
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="fw-bold mb-0">Prescription File</h5>
+                    </div>
+                    <div className="card-body">
+                      <a
+                        href={`${file_url}${item.prescriptionFile}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-primary"
+                      >
+                        View Prescription
+                      </a>
+                    </div>
+                  </div>
+                )
+            )}
           </div>
         </div>
       </div>

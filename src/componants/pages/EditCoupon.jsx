@@ -17,6 +17,7 @@ const EditCoupon = () => {
   // Form state
   const [formData, setFormData] = useState({
     code: "",
+    description: "",
     discountType: "percentage",
     discountValue: 10,
     expiryDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
@@ -57,6 +58,7 @@ const EditCoupon = () => {
             const coupon = couponResponse.data.coupon;
             setFormData({
               code: coupon.code,
+              description: coupon.description,
               discountType: coupon.discountType,
               discountValue: coupon.discountValue,
               expiryDate: new Date(coupon.expiryDate),
@@ -182,6 +184,7 @@ const EditCoupon = () => {
       const payload = {
         id: couponId,
         code: formData.code,
+        description: formData.description,
         discountType: formData.discountType,
         discountValue: formData.discountValue,
         expiryDate: formData.expiryDate.toISOString(),
@@ -292,6 +295,25 @@ const EditCoupon = () => {
 
                   <div className="form-group mb-3">
                     <label className="form-label">
+                      {t("description")} <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors.description ? "is-invalid" : ""
+                      }`}
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder={t("coupon_description_placeholder")}
+                    />
+                    {errors.description && (
+                      <div className="invalid-feedback">{errors.description}</div>
+                    )}
+                  </div>
+
+                  <div className="form-group mb-3">
+                    <label className="form-label">
                       {t("discount_type")}{" "}
                       <span className="text-danger">*</span>
                     </label>
@@ -326,7 +348,7 @@ const EditCoupon = () => {
                         }
                       />
                       <span className="input-group-text">
-                        {formData.discountType === "percentage" ? "%" : "₹"}
+                        {formData.discountType === "percentage" ? "%" : "€"}
                       </span>
                       {errors.discountValue && (
                         <div className="invalid-feedback">

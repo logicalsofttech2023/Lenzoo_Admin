@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FiEdit2, FiTrash2, FiPlus, FiX, FiEye, FiUpload, FiImage } from "react-icons/fi";
+import {
+  FiEdit2,
+  FiTrash2,
+  FiPlus,
+  FiX,
+  FiEye,
+  FiUpload,
+  FiImage,
+} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { ColorRing } from "react-loader-spinner";
 import { useTranslation } from "react-i18next";
@@ -23,7 +31,7 @@ const LensList = () => {
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   const [totalCount, setTotalCount] = useState(0);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     powerType: "",
@@ -32,9 +40,9 @@ const LensList = () => {
     price: "",
     type: "",
     benefits: [""],
-    features: [{ text: "", image: null, preview: "" }]
+    features: [{ text: "", image: null, preview: "" }],
   });
-  
+
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
@@ -68,7 +76,7 @@ const LensList = () => {
 
   const fetchPowerTypes = async () => {
     try {
-      const response = await axios.get(`${base_url}getPowerTypeDropdown`, {
+      const response = await axios.get(`${base_url}getPowerTypeInAdmin`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -103,7 +111,8 @@ const LensList = () => {
 
   const deleteLensMedia = async (type, index, id) => {
     try {
-      const response = await axios.post(`${base_url}deleteLensMedia`, 
+      const response = await axios.post(
+        `${base_url}deleteLensMedia`,
         { type, index, id },
         {
           headers: {
@@ -130,29 +139,37 @@ const LensList = () => {
   // Get type options based on selected power type
   const getTypeOptions = () => {
     if (!formData.powerType) return [];
-    
-    const selectedPowerType = powerTypes.find(pt => pt._id === formData.powerType);
-    
+
+    const selectedPowerType = powerTypes.find(
+      (pt) => pt._id === formData.powerType
+    );
+
     if (selectedPowerType) {
       if (selectedPowerType.title === "With Power") {
-        return ["Bestseller", "Work Friendly", "High Power", "Driving", "Colored"];
+        return [
+          "Bestseller",
+          "Work Friendly",
+          "High Power",
+          "Driving",
+          "Colored",
+        ];
       } else if (selectedPowerType.title === "Progressive/Bifocals") {
         return ["Progressive", "Bifocals"];
       }
     }
-    
+
     return [];
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // If powerType is changing, reset the type field
     if (name === "powerType") {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        type: "" // Reset type when powerType changes
+        type: "", // Reset type when powerType changes
       }));
     } else {
       setFormData((prev) => ({
@@ -201,7 +218,7 @@ const LensList = () => {
     if (file) {
       const newFeatures = [...formData.features];
       newFeatures[index].image = file;
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -235,7 +252,7 @@ const LensList = () => {
     const file = e.target.files[0];
     if (file) {
       setThumbnailFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -249,7 +266,7 @@ const LensList = () => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       setImageFiles(files);
-      
+
       // Create previews
       const previews = [];
       files.forEach((file) => {
@@ -284,7 +301,7 @@ const LensList = () => {
           const updatedImages = [...existingImages];
           updatedImages.splice(index, 1);
           setExistingImages(updatedImages);
-          
+
           Swal.fire(t("deletedSuccess"), t("imageDeleted"), "success");
         } else {
           Swal.fire(t("error"), t("failedToDelete"), "error");
@@ -309,13 +326,17 @@ const LensList = () => {
       });
 
       if (result.isConfirmed) {
-        const success = await deleteLensMedia("featureImage", index, currentLens._id);
+        const success = await deleteLensMedia(
+          "featureImage",
+          index,
+          currentLens._id
+        );
         if (success) {
           // Update UI
           const updatedFeatures = [...existingFeatures];
           updatedFeatures[index].image = "";
           setExistingFeatures(updatedFeatures);
-          
+
           Swal.fire(t("deletedSuccess"), t("imageDeleted"), "success");
         } else {
           Swal.fire(t("error"), t("failedToDelete"), "error");
@@ -340,11 +361,15 @@ const LensList = () => {
       });
 
       if (result.isConfirmed) {
-        const success = await deleteLensMedia("thumbnail", null, currentLens._id);
+        const success = await deleteLensMedia(
+          "thumbnail",
+          null,
+          currentLens._id
+        );
         if (success) {
           // Update UI
           setThumbnailPreview("");
-          
+
           Swal.fire(t("deletedSuccess"), t("imageDeleted"), "success");
         } else {
           Swal.fire(t("error"), t("failedToDelete"), "error");
@@ -366,43 +391,47 @@ const LensList = () => {
       formDataToSend.append("warranty", formData.warranty);
       formDataToSend.append("title", formData.title);
       formDataToSend.append("price", formData.price);
-      
+
       // Only add type if powerType is "With Power" or "Progressive/Bifocals"
-      const selectedPowerType = powerTypes.find(pt => pt._id === formData.powerType);
-      if (selectedPowerType && 
-          (selectedPowerType.title === "With Power" || selectedPowerType.title === "Progressive/Bifocals")) {
+      const selectedPowerType = powerTypes.find(
+        (pt) => pt._id === formData.powerType
+      );
+      if (
+        selectedPowerType &&
+        (selectedPowerType.title === "With Power" ||
+          selectedPowerType.title === "Progressive/Bifocals")
+      ) {
         formDataToSend.append("type", formData.type);
       }
-      
+
       formDataToSend.append("benefits", JSON.stringify(formData.benefits));
-      formDataToSend.append("features", JSON.stringify(formData.features.map(f => ({ text: f.text }))));
-      
+      formDataToSend.append(
+        "features",
+        JSON.stringify(formData.features.map((f) => ({ text: f.text })))
+      );
+
       if (thumbnailFile) {
         formDataToSend.append("thumbnail", thumbnailFile);
       }
-      
+
       if (imageFiles.length > 0) {
         imageFiles.forEach((file) => {
           formDataToSend.append("images", file);
         });
       }
-      
+
       formData.features.forEach((feature, index) => {
         if (feature.image) {
           formDataToSend.append("featuresImages", feature.image);
         }
       });
 
-      const response = await axios.post(
-        `${base_url}addLens`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.post(`${base_url}addLens`, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (response.data.success) {
         Swal.fire({
@@ -422,9 +451,7 @@ const LensList = () => {
       Swal.fire({
         icon: "error",
         title: t("error"),
-        text:
-          error.response?.data?.message ||
-          t("errorOccurred"),
+        text: error.response?.data?.message || t("errorOccurred"),
       });
     } finally {
       setIsSubmitting(false);
@@ -439,50 +466,42 @@ const LensList = () => {
 
     try {
       const formDataToSend = new FormData();
+      formDataToSend.append("id", currentLens._id);
       formDataToSend.append("powerType", formData.powerType);
       formDataToSend.append("warranty", formData.warranty);
       formDataToSend.append("title", formData.title);
       formDataToSend.append("price", formData.price);
-      
+
       // Only add type if powerType is "With Power" or "Progressive/Bifocals"
-      const selectedPowerType = powerTypes.find(pt => pt._id === formData.powerType);
-      if (selectedPowerType && 
-          (selectedPowerType.title === "With Power" || selectedPowerType.title === "Progressive/Bifocals")) {
+      const selectedPowerType = powerTypes.find(
+        (pt) => pt._id === formData.powerType
+      );
+      if (
+        selectedPowerType &&
+        (selectedPowerType.title === "With Power" ||
+          selectedPowerType.title === "Progressive/Bifocals")
+      ) {
         formDataToSend.append("type", formData.type);
       }
-      
+
       formDataToSend.append("benefits", JSON.stringify(formData.benefits));
-      
-      // Prepare features data
-      const featuresData = formData.features.map((feature, index) => {
-        // For existing features, check if we have an image from the existingFeatures array
-        if (index < existingFeatures.length && existingFeatures[index].image) {
-          return {
-            text: feature.text,
-            image: existingFeatures[index].image
-          };
-        }
-        return {
-          text: feature.text,
-          image: feature.image || ""
-        };
-      });
-      
-      formDataToSend.append("features", JSON.stringify(featuresData));
-      formDataToSend.append("id", currentLens._id);
-      
+      formDataToSend.append(
+        "features",
+        JSON.stringify(formData.features.map((f) => ({ text: f.text })))
+      );
+
       if (thumbnailFile) {
         formDataToSend.append("thumbnail", thumbnailFile);
       }
-      
+
       if (imageFiles.length > 0) {
         imageFiles.forEach((file) => {
           formDataToSend.append("images", file);
         });
       }
-      
+
       formData.features.forEach((feature, index) => {
-        if (feature.image && typeof feature.image !== 'string') {
+        if (feature.image) {
           formDataToSend.append("featuresImages", feature.image);
         }
       });
@@ -516,9 +535,7 @@ const LensList = () => {
       Swal.fire({
         icon: "error",
         title: t("error"),
-        text:
-          error.response?.data?.message ||
-          t("errorOccurred"),
+        text: error.response?.data?.message || t("errorOccurred"),
       });
     } finally {
       setIsSubmitting(false);
@@ -564,7 +581,7 @@ const LensList = () => {
       price: "",
       type: "",
       benefits: [""],
-      features: [{ text: "", image: null, preview: "" }]
+      features: [{ text: "", image: null, preview: "" }],
     });
     setThumbnailFile(null);
     setThumbnailPreview("");
@@ -588,30 +605,34 @@ const LensList = () => {
           title: lensDetails.title || "",
           price: lensDetails.price || "",
           type: lensDetails.type || "",
-          benefits: lensDetails.benefits && lensDetails.benefits.length > 0 
-            ? lensDetails.benefits 
-            : [""],
-          features: lensDetails.features && lensDetails.features.length > 0
-            ? lensDetails.features.map(f => ({ 
-                text: f.text || "", 
-                image: f.image || null, 
-                preview: f.image ? `${file_url}${f.image}` : "" 
-              }))
-            : [{ text: "", image: null, preview: "" }]
+          benefits:
+            lensDetails.benefits && lensDetails.benefits.length > 0
+              ? lensDetails.benefits
+              : [""],
+          features:
+            lensDetails.features && lensDetails.features.length > 0
+              ? lensDetails.features.map((f) => ({
+                  text: f.text || "",
+                  image: f.image || null,
+                  preview: f.image ? `${file_url}${f.image}` : "",
+                }))
+              : [{ text: "", image: null, preview: "" }],
         });
-        
+
         // Store existing images and features for media deletion
         setExistingImages(lensDetails.images || []);
         setExistingFeatures(lensDetails.features || []);
-        
+
         if (lensDetails.thumbnail) {
           setThumbnailPreview(`${file_url}${lensDetails.thumbnail}`);
         }
-        
+
         if (lensDetails.images && lensDetails.images.length > 0) {
-          setImagePreviews(lensDetails.images.map(img => `${file_url}${img}`));
+          setImagePreviews(
+            lensDetails.images.map((img) => `${file_url}${img}`)
+          );
         }
-        
+
         setIsEditing(true);
         setShowForm(true);
       }
@@ -628,10 +649,15 @@ const LensList = () => {
   // Check if type field should be shown
   const shouldShowTypeField = () => {
     if (!formData.powerType) return false;
-    
-    const selectedPowerType = powerTypes.find(pt => pt._id === formData.powerType);
-    return selectedPowerType && 
-           (selectedPowerType.title === "With Power" || selectedPowerType.title === "Progressive/Bifocals");
+
+    const selectedPowerType = powerTypes.find(
+      (pt) => pt._id === formData.powerType
+    );
+    return (
+      selectedPowerType &&
+      (selectedPowerType.title === "With Power" ||
+        selectedPowerType.title === "Progressive/Bifocals")
+    );
   };
 
   if (error) {
@@ -679,7 +705,7 @@ const LensList = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="col-md-6 mb-3">
                 <label className="form-label">{t("warranty")}</label>
                 <input
@@ -704,7 +730,7 @@ const LensList = () => {
                   required
                 />
               </div>
-              
+
               <div className="col-md-6 mb-3">
                 <label className="form-label">{t("price")}</label>
                 <input
@@ -745,7 +771,9 @@ const LensList = () => {
                       type="text"
                       className="form-control"
                       value={benefit}
-                      onChange={(e) => handleBenefitChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleBenefitChange(index, e.target.value)
+                      }
                       placeholder={t("benefit")}
                     />
                     {formData.benefits.length > 1 && (
@@ -778,28 +806,34 @@ const LensList = () => {
                         <textarea
                           className="form-control"
                           value={feature.text}
-                          onChange={(e) => handleFeatureTextChange(index, e.target.value)}
+                          onChange={(e) =>
+                            handleFeatureTextChange(index, e.target.value)
+                          }
                           placeholder={t("featureText")}
                           rows="3"
                         />
                       </div>
                       <div className="col-md-6 mb-2">
-                        <label className="form-label">{t("featureImage")}</label>
-                        
+                        <label className="form-label">
+                          {t("featureImage")}
+                        </label>
+
                         {/* Show existing feature image if available */}
                         {isEditing && existingFeatures[index]?.image && (
                           <div className="mb-2">
                             <div className="d-flex align-items-center">
-                              <img 
-                                src={`${file_url}${existingFeatures[index].image}`} 
-                                alt="Existing feature" 
-                                className="img-thumbnail me-2" 
-                                style={{ maxHeight: '60px' }}
+                              <img
+                                src={`${file_url}${existingFeatures[index].image}`}
+                                alt="Existing feature"
+                                className="img-thumbnail me-2"
+                                style={{ maxHeight: "60px" }}
                               />
                               <button
                                 type="button"
                                 className="btn btn-sm btn-outline-danger"
-                                onClick={() => handleRemoveExistingFeatureImage(index)}
+                                onClick={() =>
+                                  handleRemoveExistingFeatureImage(index)
+                                }
                               >
                                 <FiTrash2 />
                               </button>
@@ -807,7 +841,7 @@ const LensList = () => {
                             <small className="text-muted">Existing image</small>
                           </div>
                         )}
-                        
+
                         <input
                           type="file"
                           className="form-control"
@@ -816,11 +850,11 @@ const LensList = () => {
                         />
                         {feature.preview && (
                           <div className="mt-2">
-                            <img 
-                              src={feature.preview} 
-                              alt="Feature preview" 
-                              className="img-thumbnail" 
-                              style={{ maxHeight: '100px' }}
+                            <img
+                              src={feature.preview}
+                              alt="Feature preview"
+                              className="img-thumbnail"
+                              style={{ maxHeight: "100px" }}
                             />
                           </div>
                         )}
@@ -848,16 +882,16 @@ const LensList = () => {
 
               <div className="col-md-6 mb-3">
                 <label className="form-label">{t("thumbnail")}</label>
-                
+
                 {/* Show existing thumbnail if available */}
                 {isEditing && thumbnailPreview && (
                   <div className="mb-2">
                     <div className="d-flex align-items-center">
-                      <img 
-                        src={thumbnailPreview} 
-                        alt="Existing thumbnail" 
-                        className="img-thumbnail me-2" 
-                        style={{ maxHeight: '60px' }}
+                      <img
+                        src={thumbnailPreview}
+                        alt="Existing thumbnail"
+                        className="img-thumbnail me-2"
+                        style={{ maxHeight: "60px" }}
                       />
                       <button
                         type="button"
@@ -870,7 +904,7 @@ const LensList = () => {
                     <small className="text-muted">Existing thumbnail</small>
                   </div>
                 )}
-                
+
                 <input
                   type="file"
                   className="form-control"
@@ -879,11 +913,11 @@ const LensList = () => {
                 />
                 {thumbnailPreview && !isEditing && (
                   <div className="mt-2">
-                    <img 
-                      src={thumbnailPreview} 
-                      alt="Thumbnail preview" 
-                      className="img-thumbnail" 
-                      style={{ maxHeight: '200px' }}
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
+                      className="img-thumbnail"
+                      style={{ maxHeight: "200px" }}
                     />
                   </div>
                 )}
@@ -891,24 +925,26 @@ const LensList = () => {
 
               <div className="col-md-6 mb-3">
                 <label className="form-label">{t("images")}</label>
-                
+
                 {/* Show existing images if available */}
                 {isEditing && existingImages.length > 0 && (
                   <div className="mb-2">
-                    <label className="form-label small">{t("existingImages")}</label>
+                    <label className="form-label small">
+                      {t("existingImages")}
+                    </label>
                     <div className="d-flex flex-wrap gap-4 mb-2">
                       {existingImages.map((img, index) => (
                         <div key={index} className="position-relative">
-                          <img 
-                            src={`${file_url}${img}`} 
-                            alt={`Existing ${index}`} 
-                            className="img-thumbnail" 
-                            style={{ height: '80px' }}
+                          <img
+                            src={`${file_url}${img}`}
+                            alt={`Existing ${index}`}
+                            className="img-thumbnail"
+                            style={{ height: "80px" }}
                           />
                           <button
                             type="button"
                             className="btn btn-sm btn-outline-danger position-absolute top-0 end-0"
-                            style={{ transform: 'translate(50%, -50%)' }}
+                            style={{ transform: "translate(50%, -50%)" }}
                             onClick={() => handleRemoveExistingImage(index)}
                           >
                             <FiX />
@@ -918,7 +954,7 @@ const LensList = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <input
                   type="file"
                   className="form-control"
@@ -929,12 +965,16 @@ const LensList = () => {
                 {imagePreviews.length > 0 && (
                   <div className="mt-2 d-flex flex-wrap gap-2">
                     {imagePreviews.map((preview, index) => (
-                      <img 
+                      <img
                         key={index}
-                        src={preview} 
-                        alt={`Preview ${index}`} 
-                        className="img-thumbnail" 
-                        style={{ maxHeight: '100px', width: '100px', objectFit: 'cover' }}
+                        src={preview}
+                        alt={`Preview ${index}`}
+                        className="img-thumbnail"
+                        style={{
+                          maxHeight: "100px",
+                          width: "100px",
+                          objectFit: "cover",
+                        }}
                       />
                     ))}
                   </div>
@@ -1031,11 +1071,11 @@ const LensList = () => {
                     <td>{lens.type}</td>
                     <td>
                       {lens.thumbnail && (
-                        <img 
-                          src={`${file_url}${lens.thumbnail}`} 
+                        <img
+                          src={`${file_url}${lens.thumbnail}`}
                           alt={lens.title}
                           className="img-thumbnail"
-                          style={{ maxHeight: '50px' }}
+                          style={{ maxHeight: "50px" }}
                         />
                       )}
                     </td>

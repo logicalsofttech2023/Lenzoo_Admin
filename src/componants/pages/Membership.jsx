@@ -563,7 +563,7 @@ const Membership = () => {
                     <td>{membership.title}</td>
                     <td>{membership.description}</td>
                     <td>{t(membership.planType)}</td>
-                    <td>₹{membership.price}</td>
+                    <td>€{membership.price}</td>
                     <td>{membership.durationInDays} {t("days")}</td>
                     <td>
                       {membership.isRecurring ? (

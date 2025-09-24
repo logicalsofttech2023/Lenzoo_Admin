@@ -278,8 +278,8 @@ const OrdersList = () => {
                             <td>{product?.productType}</td>
                             <td>{product?.frameType}</td>
                             <td>{product?.frameShape}</td>
-                            <td>₹{product?.originalPrice}</td>
-                            <td>₹{product?.sellingPrice}</td>
+                            <td>€{product?.originalPrice}</td>
+                            <td>€{product?.sellingPrice}</td>
                             <td>{item?.quantity}</td>
                             <td>
                               <div

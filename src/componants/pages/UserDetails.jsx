@@ -104,7 +104,7 @@ const UserDetails = () => {
       maximumFractionDigits: 0,
     })
       .format(price)
-      .replace("₹", "₹ ");
+      .replace("€", "€ ");
   };
 
   const getOrderStatusBadge = (status) => {

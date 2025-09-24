@@ -499,5 +499,10 @@
   "lensUpdated": "Lente atualizada com sucesso",
   "lensDeleted": "Lente excluída com sucesso",
   "existingImages": "Imagens Existentes",
-  "selectType": "Selecionar Tipo"
+  "selectType": "Selecionar Tipo",
+  "customer_information": "Informações do Cliente",
+  "lens_price": "Preço da Lente",
+  "lens_type": "Tipo de Lente",
+  "power_type": "Tipo de Potência",
+  "coupon_description_placeholder": "Breve descrição do cupom"
 }

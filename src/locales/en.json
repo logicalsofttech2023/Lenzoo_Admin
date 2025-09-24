@@ -499,6 +499,11 @@
   "lensUpdated": "Lens updated successfully",
   "lensDeleted": "Lens deleted successfully",
   "existingImages": "Existing Images",
-  "selectType": "Select Type"
+  "selectType": "Select Type",
+  "customer_information": "Customer Information",
+  "lens_price": "Lens Price",
+  "lens_type": "Lens Type",
+  "power_type": "Power Type",
+  "coupon_description_placeholder": "Brief description of the coupon"
   
 }
